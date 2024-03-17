@@ -19,8 +19,9 @@ Capture cam;
 // Create a variable to store an instance of the OpenCV class
 OpenCV opencv;
 
-int prevY;
+int prevY = -1000;
 int prevX;
+int storedW;
 int jumpDelay;
 int minSize = 50;
 int curPage = 0;
@@ -32,8 +33,7 @@ boolean Start = false;
 boolean Lore = false;
 boolean Instruction = false;
 boolean Game = false;
-Page Scene1; 
-Page [] Cutscene1;
+PFont Deltarune; // font from deltarune
 
 // variable to hold the Audio input 
 AudioIn input;
@@ -42,6 +42,7 @@ Amplitude volume;
 
 void setup() {
   size(1920,1080);
+  background(100, 50 , 50);
   // Populate an array with a list of available capture devices
   String[] cameras = Capture.list();
   // Initialize the camera object using the first element of the list denoted by cameras[0]
@@ -49,10 +50,10 @@ void setup() {
   
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
-  Test = loadImage("Title.gif");
+  Test = loadImage("Story1.png");
+  Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
+  textFont(Deltarune);
   frameRate(30);
-  Scene1 = new Page(new int[] {1, 2}, new String[] {"choice1, choice2"}, "Text goes here", Test, Talking);
-  Cutscene1 = new Page [] {Scene1};
    // Start capturing the images from the camera
   cam.start();
 
@@ -73,6 +74,7 @@ void setup() {
   volume.input(input);
   
   Opening.loop();
+  Talking.loop();
 }
 void draw() {
   // Read the new frame from the webcam if available
@@ -84,7 +86,6 @@ void draw() {
     startScreen();
   }
   if (Lore) {
-    println("I got here");
     loreScreens();
   }
   
@@ -117,12 +118,24 @@ void startScreen(){
 
   if (Jump()) {
     Start = false;
-    Game = true;
+    Lore = true;
   }
 }
 
 void loreScreens(){
-    Scene1.displayPage();
+    image(Test, 0,0, 1920,1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255, 244, 85);
+    stroke(0);
+    rect(50,700,245,270);
+    image(Talking, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("MOM", 95, 1045);
+    textSize(32);
+    text("Statement 1", 600, 900);
     if (Jump()){
       Lore = false;
       Game = true;
@@ -165,15 +178,20 @@ boolean Jump(){
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
         int y = faces[i].y;
+        int w = faces[i].width;
+        if (prevY == -1000) {
+          prevY = y;
+        }
         
         
-        if(y < prevY - 40 && faces[i] != null && millis() - jumpDelay >= 550) { // tracks if you lift your head 40 pixels up
+        if(y < prevY - 40 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 10 && w >= storedW - 10) { // tracks if you lift your head 40 pixels up
           println("jump");
           jumpDelay = millis();
           return true;
         }
-        prevY = y;
-    
+        if (y != 0) {
+          prevY = y;
+        }
     
 
       }
@@ -200,8 +218,13 @@ boolean calibrated(){
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
         int w = faces[i].width;
-           
-        if (w > minSize && w < 80 && faces[i] != null) {
+        int y = faces[i].y;
+        rectMode(CENTER);
+        rect(width / 2, y + 325, 65, 65);
+        rectMode(CORNER);
+        if (w > minSize && w < 65 && faces[i] != null) {
+          println(faces[i]);
+          storedW = w;
           return true;
         }
       }
