@@ -27,12 +27,21 @@ int minSize = 50;
 int curPage = 0;
 Gif Opening;
 Gif Talking;
-PImage Test;
+Gif jumpIcon;
+PImage Location;
+PImage Box;
+PImage openBox;
 boolean Calibrate = true;
 boolean Start = false;
 boolean Lore = false;
 boolean Instruction = false;
 boolean Game = false;
+
+boolean Scene1 = true;
+boolean Scene2 = false;
+boolean Scene3 = false;
+boolean Scene4 = false;
+boolean finishedDialogue = false;
 PFont Deltarune; // font from deltarune
 
 // variable to hold the Audio input 
@@ -50,7 +59,10 @@ void setup() {
   
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
-  Test = loadImage("Story1.png");
+  jumpIcon = new Gif(this, "jumpIcon.gif");
+  Location = loadImage("LocationSet.png");
+  Box = loadImage("Box.png");
+  openBox = loadImage("openBox.png");
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
   frameRate(30);
@@ -75,6 +87,7 @@ void setup() {
   
   Opening.loop();
   Talking.loop();
+  jumpIcon.loop();
 }
 void draw() {
   // Read the new frame from the webcam if available
@@ -123,7 +136,8 @@ void startScreen(){
 }
 
 void loreScreens(){
-    image(Test, 0,0, 1920,1080);
+  if (Scene1) {
+    image(Location, 0,0, 1920,1080);
     fill(0);
     rect(0, 800, 1920, 300);
     fill(255, 244, 85);
@@ -136,7 +150,57 @@ void loreScreens(){
     text("MOM", 95, 1045);
     textSize(32);
     text("Statement 1", 600, 900);
-    if (Jump()){
+    image(jumpIcon, 1800, 1000);
+    if (Jump()) {
+      Scene1 = false;
+      Scene2 = true;
+    }
+  }
+  
+  if (Scene2) {
+    image(Box, 0,0, 1920,1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255, 244, 85);
+    stroke(0);
+    rect(50,700,245,270);
+    image(Talking, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("MOM", 95, 1045);
+    textSize(32);
+    text("Statement 2", 600, 900);
+    if (Jump()) {
+      Scene2 = false;
+      Scene3 = true;
+    }
+  }
+  
+  if (Scene3) {
+    image(openBox, 0,0, 1920,1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255, 244, 85);
+    stroke(0);
+    rect(50,700,245,270);
+    image(Talking, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("MOM", 95, 1045);
+    textSize(32);
+    text("Statement 3", 600, 900);
+    if (Jump()) { //Temporary to get to game screen
+      Scene3 = false;
+      Lore = false;
+      Game = true;
+    }
+  } 
+  
+  if (Scene4) {
+  }
+    if (Jump() && finishedDialogue){
       Lore = false;
       Game = true;
     }
@@ -217,10 +281,11 @@ boolean calibrated(){
     for (int i = 0; i < 1; i++) {
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
+        int x = faces[i].x;
         int w = faces[i].width;
         int y = faces[i].y;
         rectMode(CENTER);
-        rect(width / 2, y + 325, 65, 65);
+        rect(x + 680, y + 325, 65, 65);
         rectMode(CORNER);
         if (w > minSize && w < 65 && faces[i] != null) {
           println(faces[i]);
