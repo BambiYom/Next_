@@ -171,6 +171,7 @@ void loreScreens(){
     text("MOM", 95, 1045);
     textSize(32);
     text("Statement 2", 600, 900);
+    image(jumpIcon, 1800, 1000);
     if (Jump()) {
       Scene2 = false;
       Scene3 = true;
@@ -191,6 +192,7 @@ void loreScreens(){
     text("MOM", 95, 1045);
     textSize(32);
     text("Statement 3", 600, 900);
+    image(jumpIcon, 1800, 1000);
     if (Jump()) { //Temporary to get to game screen
       Scene3 = false;
       Lore = false;
