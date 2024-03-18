@@ -299,3 +299,16 @@ boolean calibrated(){
   } 
   return false;
 }
+
+// changing background based on pressing keys (For debugging)
+void keyPressed() {
+  if ((key == 'a' || key == 'A')) {
+    Calibrate = false;
+    Start = true;
+  }
+
+  if ((key == 's' || key == 'S')) {
+    Start = false;
+    Lore = true;
+  }
+}
