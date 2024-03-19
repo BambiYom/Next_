@@ -25,6 +25,8 @@ int storedW;
 int jumpDelay;
 int minSize = 50;
 int curPage = 0;
+int energyCharge = 0;
+int chargingMax;
 Gif Opening;
 Gif Talking;
 Gif jumpIcon;
@@ -222,7 +224,11 @@ void gameScreen(){
     cam.read();
   }
   if (Jump()){
+    energyCharge = energyCharge + 20;
   }
+  chargingMax = constrain(energyCharge, 0, 200);
+  rect(width - 200, height - 100, 50, chargingMax);
+  
   // Display the webcam image
     image(cam, 1000, 100, cam.width, cam.height);
 }
@@ -260,7 +266,6 @@ boolean Jump(){
         if (y != 0) {
           prevY = y;
         }
-    
 
       }
     }
