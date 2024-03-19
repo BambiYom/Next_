@@ -31,6 +31,7 @@ Gif jumpIcon;
 PImage Location;
 PImage Box;
 PImage openBox;
+PImage calibrateIns;
 boolean Calibrate = true;
 boolean Start = false;
 boolean Lore = false;
@@ -63,6 +64,7 @@ void setup() {
   Location = loadImage("LocationSet.png");
   Box = loadImage("Box.png");
   openBox = loadImage("openBox.png");
+  calibrateIns = loadImage("calibrate.png");
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
   frameRate(30);
@@ -112,7 +114,7 @@ void draw() {
 }
 
 void calibrate(){
-  background(25);
+  image(calibrateIns, 0, 0);
   if (cam.available() == true) {
   cam.read();
   }
