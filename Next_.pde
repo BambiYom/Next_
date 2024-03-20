@@ -19,6 +19,7 @@ Capture cam;
 // Create a variable to store an instance of the OpenCV class
 OpenCV opencv;
 
+SoundFile introSong;
 int prevY = -1000;
 int prevX;
 int storedW;
@@ -60,6 +61,7 @@ void setup() {
   // Initialize the camera object using the first element of the list denoted by cameras[0]
   cam = new Capture(this, cameras[0]);
   
+  introSong = new SoundFile(this, "a3_intromusic_FINAL-V1.mp3");
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
@@ -92,6 +94,7 @@ void setup() {
   Opening.loop();
   Talking.loop();
   jumpIcon.loop();
+  introSong.loop();
 }
 void draw() {
   // Read the new frame from the webcam if available
@@ -134,6 +137,7 @@ void startScreen(){
   image(Opening,0,0, 1920, 1080);
 
   if (Jump()) {
+    introSong.pause();
     Start = false;
     Lore = true;
   }
@@ -227,7 +231,7 @@ void gameScreen(){
     energyCharge = energyCharge + 20;
   }
   chargingMax = constrain(energyCharge, 0, 200);
-  rect(width - 200, height - 100, 50, chargingMax);
+  rect(width - 200, height - 100, 50, -chargingMax * 5);
   
   // Display the webcam image
     image(cam, 1000, 100, cam.width, cam.height);
@@ -258,7 +262,7 @@ boolean Jump(){
         }
         
         
-        if(y < prevY - 40 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 10 && w >= storedW - 10) { // tracks if you lift your head 40 pixels up
+        if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 15 && w >= storedW - 15) { // tracks if you lift your head 40 pixels up
           println("jump");
           jumpDelay = millis();
           return true;
