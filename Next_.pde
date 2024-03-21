@@ -24,10 +24,13 @@ int prevY = -1000;
 int prevX;
 int storedW;
 int jumpDelay;
+int atkDelay;
 int minSize = 50;
 int curPage = 0;
 int energyCharge = 0;
 int chargingMax;
+int Timingperframe = 2500;
+int playerHealth = 10;
 Gif Opening;
 Gif Talking;
 Gif jumpIcon;
@@ -35,6 +38,8 @@ PImage Location;
 PImage Box;
 PImage openBox;
 PImage calibrateIns;
+PImage angyFace;
+PImage heart;
 boolean Calibrate = true;
 boolean Start = false;
 boolean Lore = false;
@@ -42,11 +47,36 @@ boolean Instruction = false;
 boolean Game = false;
 
 boolean Scene1 = true;
+boolean scene1Time = true;
 boolean Scene2 = false;
+boolean scene2Time = true;
 boolean Scene3 = false;
+boolean scene3Time = true;
 boolean Scene4 = false;
+boolean scene4Time = true;
 boolean finishedDialogue = false;
+boolean isDead = false;
+
+boolean firstAtk = true;
+int atkSpeed1 = 350;
+boolean suitor1 = true;
+suitor Musician;
+int atkSpeed2 = 250;
+boolean suitor2 = false;
+suitor Rich;
+int atkSpeed3 = 150;
+boolean suitor3 = false;
+suitor Romantic;
+Timer attack;
+
 PFont Deltarune; // font from deltarune
+
+  // Timer Initialization
+Timer autoScroll;
+
+// Text appearing related
+int speed = 1;
+int index = 0;
 
 // variable to hold the Audio input 
 AudioIn input;
@@ -62,6 +92,8 @@ void setup() {
   cam = new Capture(this, cameras[0]);
   
   introSong = new SoundFile(this, "a3_intromusic_FINAL-V1.mp3");
+  
+  // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
@@ -69,6 +101,12 @@ void setup() {
   Box = loadImage("Box.png");
   openBox = loadImage("openBox.png");
   calibrateIns = loadImage("calibrate.png");
+  angyFace = loadImage("momangry.png");
+  heart = loadImage("Heart.png");
+  
+  //Timer Initalization
+  autoScroll = new Timer(3500);
+  
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
   frameRate(30);
@@ -90,6 +128,8 @@ void setup() {
 
   // Patch the input to the volume analyzer
   volume.input(input);
+  
+  Musician = new suitor(angyFace, atkSpeed1, 1, 4);
   
   Opening.loop();
   Talking.loop();
@@ -157,9 +197,14 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    text("Statement 1", 600, 900);
+    displayText("Statement 1", 600, 900);
     image(jumpIcon, 1800, 1000);
-    if (Jump()) {
+    if (scene1Time) {
+      autoScroll.start();
+      scene1Time = false;
+    }
+    if (Jump() || autoScroll.isFinished()) {
+      index = 0;
       Scene1 = false;
       Scene2 = true;
     }
@@ -178,9 +223,14 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    text("Statement 2", 600, 900);
+    displayText("Statement 2", 600, 900);
     image(jumpIcon, 1800, 1000);
-    if (Jump()) {
+    if (scene2Time) {
+      autoScroll.start();
+      scene2Time = false;
+    }
+    if (Jump() || autoScroll.isFinished()) {
+      index = 0;
       Scene2 = false;
       Scene3 = true;
     }
@@ -199,9 +249,14 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    text("Statement 3", 600, 900);
+    displayText("Statement 3", 600, 900);
     image(jumpIcon, 1800, 1000);
-    if (Jump()) { //Temporary to get to game screen
+    if (scene3Time) {
+      autoScroll.start();
+      scene3Time = false;
+    }
+    if (Jump() || autoScroll.isFinished()) { //Temporary to get to game screen
+      index = 0;
       Scene3 = false;
       Lore = false;
       Game = true;
@@ -221,20 +276,64 @@ void instructionScreen(){
 }
 
 void gameScreen(){
-  fill(255, 246, 228);
-  noStroke();
-  rect(58, 45, 1420, 990, 25);
+  float volumeVal = volume.analyze(); //from audio
+  println(volumeVal);
   if (cam.available() == true) {
     cam.read();
   }
+  if (suitor1) {
+    Suit1();
+  }
+  fill(0);
+  rect(0, 800, 1920, 300);
   if (Jump()){
     energyCharge = energyCharge + 20;
+  }
+  if (attacked(volumeVal)){
+    energyCharge = 0;
   }
   chargingMax = constrain(energyCharge, 0, 200);
   rect(width - 200, height - 100, 50, -chargingMax * 5);
   
+  for (int i = 0; i <= 10; i++){
+    fill(255,0,0);
+    rect((i * 40) + (width / 2 - 150), 900, 40, 40); 
+  }
+  for (int x = 0; x < 10 - playerHealth; x++){
+    fill(20);
+    rect((x * 40) + (width / 2 - 150), 900, 40, 40);     
+  }
   // Display the webcam image
-    image(cam, 1000, 100, cam.width, cam.height);
+    image(cam, 1500, 100, cam.width, cam.height);
+    imageMode(CENTER);
+    imageMode(CORNER);
+  image(jumpIcon, 1800, 1000);
+  
+}
+
+void Suit1(){
+  Musician.display(width/2, height/2, 521, 521);
+  float curSize = heart.width;
+  for (int i = 0; i < Musician.totalHealth(); i++){
+    fill(255,0,0);
+    rect(0 + (100 * i), 0, 10,10);
+  }
+  if (firstAtk){
+    attack = new Timer(Musician.atk()[0]);
+    attack.start();
+    firstAtk = false;
+  }
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *2), 0.2);
+  if (attack.isFinished()){
+    if (playerHealth > 0) {
+      playerHealth--;
+    } else {
+      playerHealth = 0;
+      isDead = true;
+    }
+    attack.start();
+  }
+  image(heart, width /2, height /2 , curSize, curSize);
 }
 
 boolean Jump(){
@@ -262,7 +361,7 @@ boolean Jump(){
         }
         
         
-        if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 15 && w >= storedW - 15) { // tracks if you lift your head 40 pixels up
+        if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16) { // tracks if you lift your head 40 pixels up
           println("jump");
           jumpDelay = millis();
           return true;
@@ -274,6 +373,15 @@ boolean Jump(){
       }
     }
   } 
+  return false;
+}
+
+boolean attacked(float volume){
+  if (volume >= 0.09 && millis() - atkDelay > 550) {
+    println("attacked");
+    atkDelay = millis();
+    return true;
+  }
   return false;
 }
 
@@ -321,5 +429,16 @@ void keyPressed() {
   if ((key == 's' || key == 'S')) {
     Start = false;
     Lore = true;
+  }
+}
+
+
+void displayText(String dialogue, int x, int y){ //ChatGPT inspired
+    if (index < dialogue.length()) {
+    String partialMessage = dialogue.substring(0, index+1); // Incrementally increase the number of characters displayed
+    text(partialMessage, x, y);
+    index += speed;
+  } else if (index == dialogue.length()) {
+    text(dialogue, x, y);
   }
 }
