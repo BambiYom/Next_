@@ -31,21 +31,26 @@ int energyCharge = 0;
 int chargingMax;
 int Timingperframe = 2500;
 int playerHealth = 10;
+int brokenHearts = 0;
 Gif Opening;
 Gif Talking;
+Gif Grandma;
 Gif jumpIcon;
+Gif Train;
 PImage Location;
 PImage Box;
 PImage openBox;
 PImage calibrateIns;
 PImage angyFace;
 PImage heart;
+PImage broken;
 boolean Calibrate = true;
 boolean Start = false;
 boolean Lore = false;
 boolean Instruction = false;
 boolean Game = false;
 
+// Everything related to talking
 boolean Scene1 = true;
 boolean scene1Time = true;
 boolean Scene2 = false;
@@ -53,21 +58,25 @@ boolean scene2Time = true;
 boolean Scene3 = false;
 boolean scene3Time = true;
 boolean Scene4 = false;
+int charTalking = 0;
 boolean scene4Time = true;
-boolean finishedDialogue = false;
 boolean isDead = false;
 
 boolean firstAtk = true;
-int atkSpeed1 = 350;
+int atkSpeed1 = 3500;
 boolean suitor1 = true;
 suitor Musician;
-int atkSpeed2 = 250;
+boolean defeatText1 = true;
+int atkSpeed2 = 2500;
 boolean suitor2 = false;
 suitor Rich;
-int atkSpeed3 = 150;
+boolean defeatText2 = true;
+int atkSpeed3 = 1500;
 boolean suitor3 = false;
 suitor Romantic;
+boolean defeatText3 = true;
 Timer attack;
+
 
 PFont Deltarune; // font from deltarune
 
@@ -75,7 +84,7 @@ PFont Deltarune; // font from deltarune
 Timer autoScroll;
 
 // Text appearing related
-int speed = 1;
+int speed = 2;
 int index = 0;
 
 // variable to hold the Audio input 
@@ -96,16 +105,19 @@ void setup() {
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
+  Grandma = new Gif(this, "Grandma.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
+  Train = new Gif(this, "train.gif");
   Location = loadImage("LocationSet.png");
   Box = loadImage("Box.png");
   openBox = loadImage("openBox.png");
   calibrateIns = loadImage("calibrate.png");
   angyFace = loadImage("momangry.png");
   heart = loadImage("Heart.png");
+  broken = loadImage("broken.png");
   
   //Timer Initalization
-  autoScroll = new Timer(3500);
+  autoScroll = new Timer(3000);
   
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
@@ -135,6 +147,7 @@ void setup() {
   Talking.loop();
   jumpIcon.loop();
   introSong.loop();
+  Train.loop();
 }
 void draw() {
   // Read the new frame from the webcam if available
@@ -197,7 +210,7 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    displayText("Statement 1", 600, 900);
+    displayText("Phew finally back in my dorm room.", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene1Time) {
       autoScroll.start();
@@ -223,7 +236,7 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    displayText("Statement 2", 600, 900);
+    displayText("Huh a box from back home just arrived!", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene2Time) {
       autoScroll.start();
@@ -249,7 +262,7 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
-    displayText("Statement 3", 600, 900);
+    displayText("'dont fall in love' huh", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene3Time) {
       autoScroll.start();
@@ -258,17 +271,41 @@ void loreScreens(){
     if (Jump() || autoScroll.isFinished()) { //Temporary to get to game screen
       index = 0;
       Scene3 = false;
-      Lore = false;
-      Game = true;
+      Scene4 = true;
     }
   } 
   
   if (Scene4) {
-  }
-    if (Jump() && finishedDialogue){
+    image(Train, 0,0, 1920,1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255);
+    stroke(0);      
+    rect(50,700,245,270);
+    image(Grandma, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("GRANDMA", 95, 1045);
+    textSize(32);
+    speed = 3;
+    displayText("I'm coming to see you after your classes!", 600, 900);
+    if (scene4Time) {
+      autoScroll.start();
+      scene4Time = false;
+    }
+
+    image(jumpIcon, 1800, 1000);
+    if (scene4Time) {
+      autoScroll.start();
+      scene4Time = false;
+    }
+    if (Jump() || autoScroll.isFinished()){
+      Scene4 = false;
       Lore = false;
       Game = true;
     }
+  }
 }
 
 void instructionScreen(){
@@ -276,33 +313,38 @@ void instructionScreen(){
 }
 
 void gameScreen(){
-  float volumeVal = volume.analyze(); //from audio
-  println(volumeVal);
+  fill(0);
+  rect(0,0,width, height);
   if (cam.available() == true) {
     cam.read();
   }
   if (suitor1) {
     Suit1();
   }
+  if (suitor2) {
+    
+  }
   fill(0);
   rect(0, 800, 1920, 300);
   if (Jump()){
     energyCharge = energyCharge + 20;
   }
-  if (attacked(volumeVal)){
-    energyCharge = 0;
-  }
-  chargingMax = constrain(energyCharge, 0, 200);
+  chargingMax = constrain(energyCharge, 0, 100);
+  fill(chargingMax, 0, 255 - chargingMax);
   rect(width - 200, height - 100, 50, -chargingMax * 5);
   
   for (int i = 0; i <= 10; i++){
     fill(255,0,0);
-    rect((i * 40) + (width / 2 - 150), 900, 40, 40); 
+    rect((i * 40) + (width / 2 - 250), 900, 40, 40); 
   }
   for (int x = 0; x < 10 - playerHealth; x++){
     fill(20);
-    rect((x * 40) + (width / 2 - 150), 900, 40, 40);     
+    rect((width / 2 - 250) - (x * 40) + 400 , 900, 40, 40);     
   }
+  for (int z = 0; z < brokenHearts; z++){
+    image(broken, 80 + (z * 75.125), 950, 65.125, 65.125);
+  }
+  
   // Display the webcam image
     image(cam, 1500, 100, cam.width, cam.height);
     imageMode(CENTER);
@@ -312,28 +354,43 @@ void gameScreen(){
 }
 
 void Suit1(){
+  float volumeVal = volume.analyze(); //from audio
   Musician.display(width/2, height/2, 521, 521);
-  float curSize = heart.width;
-  for (int i = 0; i < Musician.totalHealth(); i++){
+  float curSize = 65.125;
+  if (attacked(volumeVal)){
+    Musician.damaged(energyCharge / 20);
+    energyCharge = 0;
+  }
+  for (int i = 0; i < Musician.Health(); i++){
     fill(255,0,0);
-    rect(0 + (100 * i), 0, 10,10);
+    rect(width / 2 + (60 * i) - 120, 0, 50, 50);
   }
   if (firstAtk){
     attack = new Timer(Musician.atk()[0]);
     attack.start();
     firstAtk = false;
   }
-  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *2), 0.2);
+  if (Musician.isDead()){
+    if (defeatText1){
+      dialogueCutIns("Ah you got me this time", "MUSICIAN", angyFace, defeatText1);
+    }
+    suitor1 = false;
+    suitor2 = true;
+  }
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *10), 0.2);
   if (attack.isFinished()){
     if (playerHealth > 0) {
       playerHealth--;
     } else {
       playerHealth = 0;
+      brokenHearts++;
       isDead = true;
     }
     attack.start();
   }
-  image(heart, width /2, height /2 , curSize, curSize);
+  if (!Musician.isDead()){
+    image(heart, width /2, height /2 , curSize, curSize);
+  }
 }
 
 boolean Jump(){
@@ -377,7 +434,7 @@ boolean Jump(){
 }
 
 boolean attacked(float volume){
-  if (volume >= 0.09 && millis() - atkDelay > 550) {
+  if (volume >= 0.22 && millis() - atkDelay > 2000 && chargingMax == 100) {
     println("attacked");
     atkDelay = millis();
     return true;
@@ -433,12 +490,29 @@ void keyPressed() {
 }
 
 
+void dialogueCutIns(String Dialogue, String suitorName, PImage face, boolean suitorDefeat){
+  autoScroll.start();
+  if(posx >= 200){
+    int posx = -= 50;
+  }
+  image(face, posx, height /2, 521, 521);
+  fill(255, 120, 0);
+  rect(0, 800, 1920, 300);
+  textSize(64);
+  text(suitorName, 95, 1045);
+  textSize(32);
+  displayText(Dialogue, 600, 900); 
+  if (autoScroll.isFinished() && suitorDefeat){
+    suitorDefeat = false;
+  }
+}
+
 void displayText(String dialogue, int x, int y){ //ChatGPT inspired
     if (index < dialogue.length()) {
     String partialMessage = dialogue.substring(0, index+1); // Incrementally increase the number of characters displayed
     text(partialMessage, x, y);
     index += speed;
-  } else if (index == dialogue.length()) {
+  } else if (index == dialogue.length() || index == dialogue.length() + 1) {
     text(dialogue, x, y);
   }
 }
