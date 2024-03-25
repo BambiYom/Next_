@@ -41,7 +41,15 @@ PImage Location;
 PImage Box;
 PImage openBox;
 PImage calibrateIns;
+
+PImage happyFace;
 PImage angyFace;
+PImage excitedFace;
+PImage sadFace;
+PImage Suitor1;
+PImage Suitor2;
+PImage Suitor3;
+
 PImage heart;
 PImage broken;
 boolean Calibrate = true;
@@ -60,7 +68,11 @@ boolean scene3Time = true;
 boolean Scene4 = false;
 int charTalking = 0;
 boolean scene4Time = true;
+boolean MusicianDialogue = false;
+boolean RichDialogue = false;
+boolean scene5Time = true;
 boolean isDead = false;
+boolean scene6Time = true;
 
 boolean firstAtk = true;
 int atkSpeed1 = 3500;
@@ -113,8 +125,13 @@ void setup() {
   openBox = loadImage("openBox.png");
   calibrateIns = loadImage("calibrate.png");
   angyFace = loadImage("momangry.png");
+  happyFace = loadImage("momhappy.png");
+  excitedFace = loadImage("momexcited.png");
+  sadFace = loadImage("momsad.png");
   heart = loadImage("Heart.png");
   broken = loadImage("broken.png");
+  Suitor1 = loadImage("Musician.png");
+  Suitor2 = loadImage("Rich.png");
   
   //Timer Initalization
   autoScroll = new Timer(3000);
@@ -141,7 +158,8 @@ void setup() {
   // Patch the input to the volume analyzer
   volume.input(input);
   
-  Musician = new suitor(angyFace, atkSpeed1, 1, 4);
+  Musician = new suitor(Suitor1, atkSpeed1, 1, 4);
+  Rich = new suitor(Suitor2, atkSpeed2, 1, 8);
   
   Opening.loop();
   Talking.loop();
@@ -301,9 +319,82 @@ void loreScreens(){
       scene4Time = false;
     }
     if (Jump() || autoScroll.isFinished()){
+      index = 0;
       Scene4 = false;
       Lore = false;
       Game = true;
+    }
+  }
+  if (MusicianDialogue) {
+    fill(125,0,0);
+    rect(0,0, 1920, 1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255);
+    stroke(0);      
+    rect(50,700,245,270);
+    image(Suitor1, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("Musician", 95, 1045);
+    textSize(32);
+    speed = 2;
+    displayText("But will you at least buy my latest single!", 600, 900);
+    if (scene5Time) {
+      autoScroll.start();
+      scene5Time = false;
+    }
+
+    image(jumpIcon, 1800, 1000);
+    if (scene4Time) {
+      autoScroll.start();
+      scene4Time = false;
+    }
+    if (autoScroll.isFinished()){
+      index = 0;
+      MusicianDialogue = false;
+      Lore = false;
+      Game = true;
+      brokenHearts++;
+      suitor1 = false;
+      suitor2 = true;
+    }
+  }
+  if (RichDialogue) {
+    fill(125,0,0);
+    rect(0,0, 1920, 1080);
+    fill(0);
+    rect(0, 800, 1920, 300);
+    fill(255);
+    stroke(0);      
+    rect(50,700,245,270);
+    image(Suitor2, 50, 700, 245,270);
+    stroke(255);
+    fill(255);
+    textSize(64);
+    text("Rich Boy", 95, 1045);
+    textSize(32);
+    speed = 2;
+    displayText("I can buy you a house!", 600, 900);
+    if (scene6Time) {
+      autoScroll.start();
+      scene6Time = false;
+    }
+
+    image(jumpIcon, 1800, 1000);
+    if (scene4Time) {
+      autoScroll.start();
+      scene4Time = false;
+    }
+    if (autoScroll.isFinished()){
+      index = 0;
+      RichDialogue = false;
+      Lore = false;
+      Game = true;
+      brokenHearts++;
+      suitor2 = false;
+      suitor3 = true;
     }
   }
 }
@@ -322,6 +413,9 @@ void gameScreen(){
     Suit1();
   }
   if (suitor2) {
+    Suit2();
+  }
+  if (suitor3) {
     
   }
   fill(0);
@@ -332,6 +426,24 @@ void gameScreen(){
   chargingMax = constrain(energyCharge, 0, 100);
   fill(chargingMax, 0, 255 - chargingMax);
   rect(width - 200, height - 100, 50, -chargingMax * 5);
+  
+    if (brokenHearts == 0){
+    imageMode(CENTER);
+    image(angyFace, 1600, 900, 208,208);
+    imageMode(CORNER);
+  }
+  if (brokenHearts == 1){
+    imageMode(CENTER);
+    image(happyFace, 1600, 900, 208,208);
+    imageMode(CORNER);
+  }
+  if (brokenHearts == 2){
+    imageMode(CENTER);
+    image(excitedFace, 1600, 900, 208,208);
+    imageMode(CORNER);
+  }
+  // Display the webcam image
+  image(cam, 1500, 100, cam.width, cam.height);
   
   for (int i = 0; i <= 10; i++){
     fill(255,0,0);
@@ -345,12 +457,7 @@ void gameScreen(){
     image(broken, 80 + (z * 75.125), 950, 65.125, 65.125);
   }
   
-  // Display the webcam image
-    image(cam, 1500, 100, cam.width, cam.height);
-    imageMode(CENTER);
-    imageMode(CORNER);
   image(jumpIcon, 1800, 1000);
-  
 }
 
 void Suit1(){
@@ -371,11 +478,9 @@ void Suit1(){
     firstAtk = false;
   }
   if (Musician.isDead()){
-    if (defeatText1){
-      dialogueCutIns("Ah you got me this time", "MUSICIAN", angyFace, defeatText1);
-    }
-    suitor1 = false;
-    suitor2 = true;
+      MusicianDialogue = true;
+      Game = false;
+      Lore = true;
   }
   curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *10), 0.2);
   if (attack.isFinished()){
@@ -383,12 +488,48 @@ void Suit1(){
       playerHealth--;
     } else {
       playerHealth = 0;
-      brokenHearts++;
       isDead = true;
     }
     attack.start();
   }
   if (!Musician.isDead()){
+    image(heart, width /2, height /2 , curSize, curSize);
+  }
+}
+
+void Suit2(){
+  float volumeVal = volume.analyze(); //from audio
+  Rich.display(width/2, height/2, 521, 521);
+  float curSize = 65.125;
+  if (attacked(volumeVal)){
+    Rich.damaged(energyCharge / 20);
+    energyCharge = 0;
+  }
+  for (int i = 0; i < Rich.Health(); i++){
+    fill(255,0,0);
+    rect(width / 2 + (60 * i) - 120, 0, 50, 50);
+  }
+  if (firstAtk){
+    attack = new Timer(Rich.atk()[0]);
+    attack.start();
+    firstAtk = false;
+  }
+  if (Rich.isDead()){
+      RichDialogue = true;
+      Game = false;
+      Lore = true;
+  }
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *10), 0.2);
+  if (attack.isFinished()){
+    if (playerHealth > 0) {
+      playerHealth--;
+    } else {
+      playerHealth = 0;
+      isDead = true;
+    }
+    attack.start();
+  }
+  if (!Rich.isDead()){
     image(heart, width /2, height /2 , curSize, curSize);
   }
 }
@@ -489,23 +630,6 @@ void keyPressed() {
   }
 }
 
-
-void dialogueCutIns(String Dialogue, String suitorName, PImage face, boolean suitorDefeat){
-  autoScroll.start();
-  if(posx >= 200){
-    int posx = -= 50;
-  }
-  image(face, posx, height /2, 521, 521);
-  fill(255, 120, 0);
-  rect(0, 800, 1920, 300);
-  textSize(64);
-  text(suitorName, 95, 1045);
-  textSize(32);
-  displayText(Dialogue, 600, 900); 
-  if (autoScroll.isFinished() && suitorDefeat){
-    suitorDefeat = false;
-  }
-}
 
 void displayText(String dialogue, int x, int y){ //ChatGPT inspired
     if (index < dialogue.length()) {
