@@ -23,6 +23,11 @@ SoundFile introSong;
 SoundFile Calibration;
 SoundFile Bedroom;
 SoundFile Jump;
+SoundFile Dialogue1;
+SoundFile Dialogue2;
+SoundFile Dialogue3;
+SoundFile Dialogue4;
+SoundFile heartShatter;
 int prevY = -1000;
 int prevX;
 int storedW;
@@ -39,7 +44,7 @@ Gif Opening;
 Gif Talking;
 Gif Grandma;
 Gif jumpIcon;
-Gif Train;
+PImage Train;
 PImage Location;
 PImage Box;
 PImage openBox;
@@ -52,6 +57,13 @@ PImage sadFace;
 PImage Suitor1;
 PImage Suitor2;
 PImage Suitor3;
+PImage momFrame;
+PImage momHealthBar;
+PImage suitorHealthBar;
+PImage health;
+PImage momHealth;
+PImage chargeBar;
+PImage Bolt;
 
 PImage heart;
 PImage broken;
@@ -114,13 +126,18 @@ void setup() {
   Calibration = new SoundFile(this, "302-CALIBRATION DONE.wav");
   Bedroom = new SoundFile(this, "bedroom-music-v2.mp3");
   Jump = new SoundFile(this, "302-JUMP E.mp3");
+  Dialogue1 = new SoundFile(this, "mom-dialogue1.mp3");
+  Dialogue2 = new SoundFile(this, "mom-dialogue2.mp3");
+  Dialogue3 = new SoundFile(this, "mom-dialogue3.mp3");
+  Dialogue4 = new SoundFile(this, "grandma-dialogue1.mp3");
+  heartShatter = new SoundFile(this, "302-HEART SHATTER.mp3");
   
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
   Grandma = new Gif(this, "Grandma.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
-  Train = new Gif(this, "train.gif");
+  Train = loadImage("train.png");
   Location = loadImage("LocationSet.png");
   Box = loadImage("Box.png");
   openBox = loadImage("openBox.png");
@@ -134,6 +151,13 @@ void setup() {
   Suitor1 = loadImage("Musician.png");
   Suitor2 = loadImage("Rich.png");
   Suitor3 = loadImage("Romantic.png");
+  momFrame = loadImage("momframe.png");
+  momHealthBar = loadImage("momhealthbar.png");
+  suitorHealthBar = loadImage("suitorhealthbar.png");
+  health = loadImage("reddot.png");
+  momHealth = loadImage("bluedot.png");
+  chargeBar = loadImage("chargebar.png");
+  Bolt = loadImage("bolt.png");
   
   //Timer Initalization
   autoScroll = new Timer(3000);
@@ -158,7 +182,6 @@ void setup() {
   Talking.loop();
   jumpIcon.loop();
   introSong.loop();
-  Train.loop();
   Bedroom.amp(0.5);
 }
 void draw() {
@@ -201,7 +224,6 @@ void calibrate(){
 
 void startScreen(){
   image(Opening,0,0, 1920, 1080);
-
   if (Jump()) {
     introSong.pause();
     Bedroom.loop();
@@ -224,9 +246,11 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
+    
     displayText("Phew finally back in my dorm room.", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene1Time) {
+      Dialogue1.play();
       autoScroll.start();
       scene1Time = false;
     }
@@ -253,6 +277,7 @@ void loreScreens(){
     displayText("Huh a box from back home just arrived!", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene2Time) {
+      Dialogue2.play();
       autoScroll.start();
       scene2Time = false;
     }
@@ -276,9 +301,11 @@ void loreScreens(){
     textSize(64);
     text("MOM", 95, 1045);
     textSize(32);
+    
     displayText("'dont fall in love' huh", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene3Time) {
+      Dialogue3.play();
       autoScroll.start();
       scene3Time = false;
     }
@@ -305,6 +332,7 @@ void loreScreens(){
     speed = 3;
     displayText("I'm coming to see you after your classes!", 600, 900);
     if (scene4Time) {
+      Dialogue4.play();
       autoScroll.start();
       scene4Time = false;
     }
@@ -416,50 +444,50 @@ void gameScreen(){
   }
   fill(0);
   rect(0, 872, 1920, 208);
+  noStroke();
+  fill(131, 222, 241);
+  rect(0, height- 269, 269, 269);
   if (Jump()){
     energyCharge = energyCharge + 20;
   }
   chargingMax = constrain(energyCharge, 0, 100);
   fill(chargingMax, 0, 255 - chargingMax);
-  rect(width - 200, height - 100, 50, -chargingMax * 5);
-  
+  rect(0, 872 - 105, chargingMax * 20, 25);
+  image(Bolt, 5, 730, 30, 30);
+  image(chargeBar, 0, 760, 1920, 40);
     if (brokenHearts == 0){
-    image(angyFace, 0, 872, 208,208);
+    image(angyFace, 0, height - 259, 259,259);
   }
   if (brokenHearts == 1){  
-    image(happyFace, 0,  872, 208,208);
+    image(happyFace, 0, height - 259, 259,259);
   }
   if (brokenHearts == 2){
-    image(excitedFace, 0, 872, 208,208);
+    image(excitedFace,0, height - 259, 259,259);
   }
+  image(momFrame,0, height - 269, 269, 269);
   // Display the webcam image
   image(cam, width - cam.width, height - cam.height, cam.width, cam.height);
-  
-  for (int i = 0; i <= 10; i++){ // empty health
-    fill(255,0,0);
-    rect((i * 40) + (width / 2 - 250), 900, 40, 40); 
-  }
-  for (int x = 0; x < 10 - playerHealth; x++){
+  for (int x = 0; x < playerHealth; x++){
     fill(20);
-    rect((width / 2 - 250) - (x * 40) + 400 , 900, 40, 40);     
+    image(momHealth, (width / 2 - 250) + (47 * x), 851, 42, 74);     
   }
+    image(momHealthBar, width / 2 - 270, 810, 497, 136);
   for (int z = 0; z < brokenHearts; z++){
-    image(broken, 80 + (z * 75.125), 950, 65.125, 65.125);
+    image(broken, (208 + 30) + (z * 75.125), 950, 65.125, 65.125);
   }
   
   image(jumpIcon, 1800, 1000);
 }
 
 void Suit1(){
-  Musician.display(width/2, height/2, 521, 521);
+  Musician.display(width/2, height/2 - 30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
     Musician.damaged(energyCharge / 20);
     energyCharge = 0;
   }
   for (int i = 0; i < Musician.Health(); i++){
-    fill(255,0,0);
-    rect(width / 2 + (60 * i) - 120, 0, 50, 50);
+    image(health, width / 2 + (65 * i) - 120, 140, 60, 69);
   }
   if (firstAtk){
     attack = new Timer(Musician.atk()[0]);
@@ -467,6 +495,7 @@ void Suit1(){
     firstAtk = false;
   }
   if (Musician.isDead()){
+      heartShatter.play();
       MusicianDialogue = true;
       Game = false;
       Lore = true;
@@ -487,15 +516,14 @@ void Suit1(){
 }
 
 void Suit2(){
-  Rich.display(width/2, height/2, 521, 521);
+  Rich.display(width/2, height/2 -30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
     Rich.damaged(energyCharge / 20);
     energyCharge = 0;
   }
   for (int i = 0; i < Rich.Health(); i++){
-    fill(255,0,0);
-    rect(width / 2 + (60 * i) - 120, 0, 50, 50);
+    image(health, width / 2 + (70 * i) - 120, 140, 60, 69);
   }
   if (firstAtk){
     attack = new Timer(Rich.atk()[0]);
