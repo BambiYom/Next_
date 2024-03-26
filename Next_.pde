@@ -20,6 +20,9 @@ Capture cam;
 OpenCV opencv;
 
 SoundFile introSong;
+SoundFile Calibration;
+SoundFile Bedroom;
+SoundFile Jump;
 int prevY = -1000;
 int prevX;
 int storedW;
@@ -99,11 +102,6 @@ Timer autoScroll;
 int speed = 2;
 int index = 0;
 
-// variable to hold the Audio input 
-AudioIn input;
-// variable to hold the Amplitude analyzer
-Amplitude volume;
-
 void setup() {
   size(1920,1080);
   background(100, 50 , 50);
@@ -113,6 +111,9 @@ void setup() {
   cam = new Capture(this, cameras[0]);
   
   introSong = new SoundFile(this, "a3_intromusic_FINAL-V1.mp3");
+  Calibration = new SoundFile(this, "302-CALIBRATION DONE.wav");
+  Bedroom = new SoundFile(this, "bedroom-music-v2.mp3");
+  Jump = new SoundFile(this, "302-JUMP E.mp3");
   
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
@@ -132,6 +133,7 @@ void setup() {
   broken = loadImage("broken.png");
   Suitor1 = loadImage("Musician.png");
   Suitor2 = loadImage("Rich.png");
+  Suitor3 = loadImage("Romantic.png");
   
   //Timer Initalization
   autoScroll = new Timer(3000);
@@ -147,25 +149,17 @@ void setup() {
   
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   
-    // Create an Audio input and grab the 1st channel
-  input = new AudioIn(this, 0);
-
-  // Begin capturing the audio input
-  input.start();
-  // Create a new Amplitude analyzer
-  volume = new Amplitude(this);
-
-  // Patch the input to the volume analyzer
-  volume.input(input);
   
   Musician = new suitor(Suitor1, atkSpeed1, 1, 4);
   Rich = new suitor(Suitor2, atkSpeed2, 1, 8);
+  Romantic = new suitor(Suitor3, atkSpeed3, 10, 50);
   
   Opening.loop();
   Talking.loop();
   jumpIcon.loop();
   introSong.loop();
   Train.loop();
+  Bedroom.amp(0.5);
 }
 void draw() {
   // Read the new frame from the webcam if available
@@ -199,6 +193,7 @@ void calibrate(){
   imageMode(CORNER);
   
   if (calibrated()){
+    Calibration.play();
     Calibrate = false;
     Start = true;
   }
@@ -209,6 +204,7 @@ void startScreen(){
 
   if (Jump()) {
     introSong.pause();
+    Bedroom.loop();
     Start = false;
     Lore = true;
   }
@@ -419,7 +415,7 @@ void gameScreen(){
     
   }
   fill(0);
-  rect(0, 800, 1920, 300);
+  rect(0, 872, 1920, 208);
   if (Jump()){
     energyCharge = energyCharge + 20;
   }
@@ -428,24 +424,18 @@ void gameScreen(){
   rect(width - 200, height - 100, 50, -chargingMax * 5);
   
     if (brokenHearts == 0){
-    imageMode(CENTER);
-    image(angyFace, 1600, 900, 208,208);
-    imageMode(CORNER);
+    image(angyFace, 0, 872, 208,208);
   }
-  if (brokenHearts == 1){
-    imageMode(CENTER);
-    image(happyFace, 1600, 900, 208,208);
-    imageMode(CORNER);
+  if (brokenHearts == 1){  
+    image(happyFace, 0,  872, 208,208);
   }
   if (brokenHearts == 2){
-    imageMode(CENTER);
-    image(excitedFace, 1600, 900, 208,208);
-    imageMode(CORNER);
+    image(excitedFace, 0, 872, 208,208);
   }
   // Display the webcam image
-  image(cam, 1500, 100, cam.width, cam.height);
+  image(cam, width - cam.width, height - cam.height, cam.width, cam.height);
   
-  for (int i = 0; i <= 10; i++){
+  for (int i = 0; i <= 10; i++){ // empty health
     fill(255,0,0);
     rect((i * 40) + (width / 2 - 250), 900, 40, 40); 
   }
@@ -461,10 +451,9 @@ void gameScreen(){
 }
 
 void Suit1(){
-  float volumeVal = volume.analyze(); //from audio
   Musician.display(width/2, height/2, 521, 521);
   float curSize = 65.125;
-  if (attacked(volumeVal)){
+  if (attacked()){
     Musician.damaged(energyCharge / 20);
     energyCharge = 0;
   }
@@ -498,10 +487,9 @@ void Suit1(){
 }
 
 void Suit2(){
-  float volumeVal = volume.analyze(); //from audio
   Rich.display(width/2, height/2, 521, 521);
   float curSize = 65.125;
-  if (attacked(volumeVal)){
+  if (attacked()){
     Rich.damaged(energyCharge / 20);
     energyCharge = 0;
   }
@@ -561,8 +549,11 @@ boolean Jump(){
         
         if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16) { // tracks if you lift your head 40 pixels up
           println("jump");
+          Jump.play();
           jumpDelay = millis();
           return true;
+        } else if (prevY - 35 < y && y < prevY - 32 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16){
+          
         }
         if (y != 0) {
           prevY = y;
@@ -574,8 +565,8 @@ boolean Jump(){
   return false;
 }
 
-boolean attacked(float volume){
-  if (volume >= 0.22 && millis() - atkDelay > 2000 && chargingMax == 100) {
+boolean attacked(){
+  if (millis() - atkDelay > 2000 && chargingMax == 100) {
     println("attacked");
     atkDelay = millis();
     return true;
