@@ -22,14 +22,29 @@ OpenCV opencv;
 SoundFile introSong;
 SoundFile Calibration;
 SoundFile Bedroom;
+SoundFile romanticBanger;
 SoundFile Jump;
 SoundFile Dialogue1;
 SoundFile Dialogue2;
 SoundFile Dialogue3;
 SoundFile Dialogue4;
 SoundFile heartShatter;
+SoundFile boxOpen;
+SoundFile oof1;
+SoundFile oof2;
+SoundFile oof3;
+SoundFile [] oofs;
+SoundFile kya1;
+SoundFile kya2;
+SoundFile kya3;
+SoundFile kya4;
+SoundFile kya5;
+SoundFile kya6;
+SoundFile [] kyas;
 int prevY = -1000;
 int prevX;
+float camX;
+float camY;
 int storedW;
 int jumpDelay;
 int atkDelay;
@@ -37,13 +52,14 @@ int minSize = 50;
 int curPage = 0;
 int energyCharge = 0;
 int chargingMax;
-int Timingperframe = 2500;
 int playerHealth = 10;
 int brokenHearts = 0;
 Gif Opening;
 Gif Talking;
 Gif Grandma;
 Gif jumpIcon;
+Gif bigJump;
+Gif gameoverScene;
 PImage Train;
 PImage Location;
 PImage Box;
@@ -64,6 +80,11 @@ PImage health;
 PImage momHealth;
 PImage chargeBar;
 PImage Bolt;
+PImage fist;
+PImage gameBG;
+PImage suitor1Defeat;
+PImage suitor2Defeat;
+PImage gameOverTitle;
 
 PImage heart;
 PImage broken;
@@ -85,9 +106,13 @@ int charTalking = 0;
 boolean scene4Time = true;
 boolean MusicianDialogue = false;
 boolean RichDialogue = false;
+boolean RomanticDialogue;
 boolean scene5Time = true;
 boolean isDead = false;
 boolean scene6Time = true;
+boolean goodEnding = false;
+boolean Death = false;
+boolean firstDeath = true;
 
 boolean firstAtk = true;
 int atkSpeed1 = 3500;
@@ -131,12 +156,27 @@ void setup() {
   Dialogue3 = new SoundFile(this, "mom-dialogue3.mp3");
   Dialogue4 = new SoundFile(this, "grandma-dialogue1.mp3");
   heartShatter = new SoundFile(this, "302-HEART SHATTER.mp3");
+  boxOpen = new SoundFile(this, "box_open.wav");
+  oof1 = new SoundFile(this, "302-oof-001.mp3");
+  oof2 = new SoundFile(this, "302-oof-002.mp3");
+  oof3 = new SoundFile(this, "302-oof-003.mp3");
+  oofs = new SoundFile [] {oof1, oof2, oof3};
+  kya1 = new SoundFile(this, "302-iza-kyaa-001.mp3");
+  kya2 = new SoundFile(this, "302-iza-kyaa-002.mp3");
+  kya3 = new SoundFile(this, "302-iza-kyaa-003.mp3");
+  kya4 = new SoundFile(this, "302-iza-kyaa-004.mp3");
+  kya5 = new SoundFile(this, "302-iza-kyaa-005.mp3");
+  kya6 = new SoundFile(this, "302-iza-kyaa-006.mp3");
+  kyas = new SoundFile [] {kya1, kya2, kya3, kya4, kya5, kya6};
+  romanticBanger = new SoundFile(this, "suitor3-v1.5.mp3");
   
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
   Grandma = new Gif(this, "Grandma.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
+  bigJump = new Gif(this, "Big Jump.gif");
+  gameoverScene = new Gif(this, "TempGameOver.gif");
   Train = loadImage("train.png");
   Location = loadImage("LocationSet.png");
   Box = loadImage("Box.png");
@@ -158,6 +198,11 @@ void setup() {
   momHealth = loadImage("bluedot.png");
   chargeBar = loadImage("chargebar.png");
   Bolt = loadImage("bolt.png");
+  fist = loadImage("fist.png");
+  gameBG = loadImage("expbg.png");
+  suitor1Defeat = loadImage("suitor1Defeat.png");
+  suitor2Defeat = loadImage("suitor2Defeat.png");
+  gameOverTitle = loadImage("gameOver.png");
   
   //Timer Initalization
   autoScroll = new Timer(3000);
@@ -176,12 +221,15 @@ void setup() {
   
   Musician = new suitor(Suitor1, atkSpeed1, 1, 4);
   Rich = new suitor(Suitor2, atkSpeed2, 1, 8);
-  Romantic = new suitor(Suitor3, atkSpeed3, 10, 50);
+  Romantic = new suitor(Suitor3, atkSpeed3, 1, 50);
   
   Opening.loop();
   Talking.loop();
   jumpIcon.loop();
   introSong.loop();
+  Grandma.loop();
+  bigJump.loop();
+  gameoverScene.play();
   Bedroom.amp(0.5);
 }
 void draw() {
@@ -203,6 +251,10 @@ void draw() {
   
   if (Game) {
     gameScreen();
+  }
+  
+  if (Death){
+    deathScreen();
   }
 }
 
@@ -254,8 +306,9 @@ void loreScreens(){
       autoScroll.start();
       scene1Time = false;
     }
-    if (Jump() || autoScroll.isFinished()) {
+    if (autoScroll.isFinished()) {
       index = 0;
+      scene1Time = true;
       Scene1 = false;
       Scene2 = true;
     }
@@ -281,8 +334,9 @@ void loreScreens(){
       autoScroll.start();
       scene2Time = false;
     }
-    if (Jump() || autoScroll.isFinished()) {
+    if (autoScroll.isFinished()) {
       index = 0;
+      scene2Time = true;
       Scene2 = false;
       Scene3 = true;
     }
@@ -305,12 +359,14 @@ void loreScreens(){
     displayText("'dont fall in love' huh", 600, 900);
     image(jumpIcon, 1800, 1000);
     if (scene3Time) {
+      boxOpen.play();
       Dialogue3.play();
       autoScroll.start();
       scene3Time = false;
     }
-    if (Jump() || autoScroll.isFinished()) { //Temporary to get to game screen
+    if (autoScroll.isFinished()) { //Temporary to get to game screen
       index = 0;
+      scene3Time = true;
       Scene3 = false;
       Scene4 = true;
     }
@@ -332,6 +388,7 @@ void loreScreens(){
     speed = 3;
     displayText("I'm coming to see you after your classes!", 600, 900);
     if (scene4Time) {
+      Bedroom.pause();
       Dialogue4.play();
       autoScroll.start();
       scene4Time = false;
@@ -342,19 +399,20 @@ void loreScreens(){
       autoScroll.start();
       scene4Time = false;
     }
-    if (Jump() || autoScroll.isFinished()){
+    if (autoScroll.isFinished()){
       index = 0;
+      scene4Time = true;
       Scene4 = false;
+      Scene1= true;
       Lore = false;
-      Game = true;
+      Instruction = true;
     }
   }
   if (MusicianDialogue) {
-    fill(125,0,0);
-    rect(0,0, 1920, 1080);
+    image(suitor1Defeat,0,0);
     fill(0);
     rect(0, 800, 1920, 300);
-    fill(255);
+    fill(229, 204, 85);
     stroke(0);      
     rect(50,700,245,270);
     image(Suitor1, 50, 700, 245,270);
@@ -386,11 +444,10 @@ void loreScreens(){
     }
   }
   if (RichDialogue) {
-    fill(125,0,0);
-    rect(0,0, 1920, 1080);
+    image(suitor2Defeat,0,0);
     fill(0);
     rect(0, 800, 1920, 300);
-    fill(255);
+    fill(144,203,208);
     stroke(0);      
     rect(50,700,245,270);
     image(Suitor2, 50, 700, 245,270);
@@ -399,8 +456,7 @@ void loreScreens(){
     textSize(64);
     text("Rich Boy", 95, 1045);
     textSize(32);
-    speed = 2;
-    displayText("I can buy you a house!", 600, 900);
+    displayText("I guess money can't buy everything ...", 600, 900);
     if (scene6Time) {
       autoScroll.start();
       scene6Time = false;
@@ -414,6 +470,7 @@ void loreScreens(){
     if (autoScroll.isFinished()){
       index = 0;
       RichDialogue = false;
+      romanticBanger.loop();
       Lore = false;
       Game = true;
       brokenHearts++;
@@ -424,15 +481,89 @@ void loreScreens(){
 }
 
 void instructionScreen(){
-  
+  fill(0);
+  rect(0,0, width, height);
+  if (Scene1) {
+    fill(255);
+    displayText("In this game you fill up the charge bar by jumping", 400, 900);
+    imageMode(CENTER);
+    
+    imageMode(CORNER);
+    if (scene1Time) {
+      autoScroll.start();
+      scene1Time = false;
+    }
+    image(Bolt, 5, 730, 30, 30);
+    image(chargeBar, 0, 760, 1920, 40);
+    if (autoScroll.isFinished()){
+      jumpDelay = millis();
+      index = 0;
+      scene1Time = true;
+      Scene1 = false;
+      Scene2 = true;
+    }
+  } 
+  if (Scene2) {
+    fill(255);
+    displayText("Try jumping now", 780, 350);
+    imageMode(CENTER);
+    image(bigJump, width / 2, height / 2, 400, 400);
+    imageMode(CORNER);
+    image(Bolt, 5, 730, 30, 30);
+    image(chargeBar, 0, 760, 1920, 40);
+    if (Jump()){
+      index = 0;
+      Scene2 = false;
+      Scene3 = true;
+    }
+  }
+  if (Scene3) {
+    if (scene3Time){
+      autoScroll.start();
+      scene3Time = false;
+    }
+    fill(255);
+    speed = 4;
+    displayText("Good Job! Now when the bar gets full you will release an attack", 250, 900);
+    Musician.display(width/2, height/2 - 30, 521, 521);
+    image(fist, width/2, height/2, random(70, 85), random(70, 85));
+    if (autoScroll.isFinished()) {
+      index = 0;
+      scene3Time = true;
+      Scene3 = false;
+      Scene4 = true;
+    }
+  }
+  if (Scene4) {
+    if (scene4Time) {
+      autoScroll.start();
+      scene4Time = false;
+    }
+    fill(255);
+    speed = 3;
+    displayText("The Objective of the game is to reject suitors by reducing their hp to 0", 200, 900);
+    image(suitorHealthBar, width / 2 - 125, 110, 277, 108);
+    imageMode(CENTER);
+    image(broken, width / 2, height / 2, 400, 400);
+    imageMode(CORNER);
+    if (autoScroll.isFinished()) {
+          speed = 2;  
+          index = 0;
+          Scene1 = true;
+          scene4Time = true;
+          Scene4 = false;
+          Instruction = false;
+          Game = true;
+        }
+  }
 }
 
 void gameScreen(){
-  fill(0);
-  rect(0,0,width, height);
-  if (cam.available() == true) {
-    cam.read();
+  if (isDead) {
+    Game = false;
+    Death = true;
   }
+  image(gameBG,0,0);
   if (suitor1) {
     Suit1();
   }
@@ -440,10 +571,11 @@ void gameScreen(){
     Suit2();
   }
   if (suitor3) {
-    
+    Suit3();
   }
+  image(suitorHealthBar, width / 2 - 125, 110, 277, 108);
   fill(0);
-  rect(0, 872, 1920, 208);
+  rect(0, 800, 1920, 280);
   noStroke();
   fill(131, 222, 241);
   rect(0, height- 269, 269, 269);
@@ -466,23 +598,18 @@ void gameScreen(){
   }
   image(momFrame,0, height - 269, 269, 269);
   // Display the webcam image
-  image(cam, width - cam.width, height - cam.height, cam.width, cam.height);
-  for (int x = 0; x < playerHealth; x++){
-    fill(20);
-    image(momHealth, (width / 2 - 250) + (47 * x), 851, 42, 74);     
-  }
-    image(momHealthBar, width / 2 - 270, 810, 497, 136);
-  for (int z = 0; z < brokenHearts; z++){
-    image(broken, (208 + 30) + (z * 75.125), 950, 65.125, 65.125);
-  }
+  cameraTrack();
+  momHealthbar();
   
-  image(jumpIcon, 1800, 1000);
+  //image(jumpIcon, width - 330, 1000);
 }
 
 void Suit1(){
   Musician.display(width/2, height/2 - 30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
+    oofSound();
+    image(fist, width/2, height/2, random(70, 85), random(70, 85));
     Musician.damaged(energyCharge / 20);
     energyCharge = 0;
   }
@@ -500,8 +627,9 @@ void Suit1(){
       Game = false;
       Lore = true;
   }
-  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *10), 0.2);
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) / 2), 0.2);
   if (attack.isFinished()){
+    kyaSound();
     if (playerHealth > 0) {
       playerHealth--;
     } else {
@@ -511,7 +639,9 @@ void Suit1(){
     attack.start();
   }
   if (!Musician.isDead()){
+    imageMode(CENTER);
     image(heart, width /2, height /2 , curSize, curSize);
+    imageMode(CORNER);
   }
 }
 
@@ -519,11 +649,13 @@ void Suit2(){
   Rich.display(width/2, height/2 -30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
+    oofSound();
+    image(fist, width/2, height/2, random(125, 150), random(125, 150));
     Rich.damaged(energyCharge / 20);
     energyCharge = 0;
   }
   for (int i = 0; i < Rich.Health(); i++){
-    image(health, width / 2 + (70 * i) - 120, 140, 60, 69);
+    image(health, width / 2 + (35 * i) - 120, 140, 30, 69);
   }
   if (firstAtk){
     attack = new Timer(Rich.atk()[0]);
@@ -531,12 +663,14 @@ void Suit2(){
     firstAtk = false;
   }
   if (Rich.isDead()){
+      heartShatter.play();
       RichDialogue = true;
       Game = false;
       Lore = true;
   }
-  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) *10), 0.2);
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime())), 0.2);
   if (attack.isFinished()){
+    kyaSound();
     if (playerHealth > 0) {
       playerHealth--;
     } else {
@@ -546,10 +680,78 @@ void Suit2(){
     attack.start();
   }
   if (!Rich.isDead()){
+    imageMode(CENTER);
     image(heart, width /2, height /2 , curSize, curSize);
+    imageMode(CORNER);
   }
 }
 
+void Suit3(){
+  Romantic.display(width/2, height/2 -30, 521, 521);
+  float curSize = 25.125;
+  if (attacked()){
+    oofSound();
+    image(fist, width/2, height/2, random(125, 150), random(125, 150));
+    Romantic.damaged(energyCharge / 20);
+    energyCharge = 0;
+  }
+  for (int i = 0; i < Romantic.Health(); i++){
+    image(health, width / 2 + (5.2 * i) - 120, 140, 4.8, 69);
+  }
+  if (firstAtk){
+    attack = new Timer(Romantic.atk()[0]);
+    attack.start();
+    firstAtk = false;
+  }
+  if (Romantic.isDead()){
+      heartShatter.play();
+      RomanticDialogue = true;
+      Game = false;
+      Lore = true;
+  }
+  curSize = lerp(curSize, curSize + ((millis()- attack.giveTime())), 0.2);
+  if (attack.isFinished()){
+    kyaSound();
+    if (playerHealth > 0) {
+      playerHealth--;
+    } else {
+      playerHealth = 0;
+      isDead = true;
+    }
+    attack.start();
+  }
+  if (!Romantic.isDead()){
+    imageMode(CENTER);
+    image(heart, width /2, height /2 , curSize, curSize);
+    imageMode(CORNER);
+  }
+}
+
+void deathScreen(){
+  if (goodEnding){
+  } else {
+      if (Scene1) {
+      if (firstDeath){
+        autoScroll.start();
+        firstDeath = false;
+      }
+      image(gameoverScene,0,0);
+      
+      if(autoScroll.isFinished()){
+        Scene1 = false;
+        Scene2 = true;
+      }
+    }
+    if (Scene2) {
+      fill(0);
+      rect(0,0, width, height);
+      imageMode(CENTER);
+      image(gameOverTitle, width/2, height /2);
+      imageMode(CORNER);
+    }
+  }
+  
+}
 boolean Jump(){
     if (cam.available() == true) {
     cam.read();
@@ -569,11 +771,14 @@ boolean Jump(){
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
         int y = faces[i].y;
+        int x = faces[i].x;
         int w = faces[i].width;
         if (prevY == -1000) {
           prevY = y;
+          prevX = x;
         }
-        
+        camY = lerp(prevY, y, 0.1);
+        camX = lerp(prevX, x, 0.1);
         
         if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16) { // tracks if you lift your head 40 pixels up
           println("jump");
@@ -585,8 +790,8 @@ boolean Jump(){
         }
         if (y != 0) {
           prevY = y;
+          prevX = x;
         }
-
       }
     }
   } 
@@ -636,19 +841,6 @@ boolean calibrated(){
   return false;
 }
 
-// changing background based on pressing keys (For debugging)
-void keyPressed() {
-  if ((key == 'a' || key == 'A')) {
-    Calibrate = false;
-    Start = true;
-  }
-
-  if ((key == 's' || key == 'S')) {
-    Start = false;
-    Lore = true;
-  }
-}
-
 
 void displayText(String dialogue, int x, int y){ //ChatGPT inspired
     if (index < dialogue.length()) {
@@ -658,4 +850,67 @@ void displayText(String dialogue, int x, int y){ //ChatGPT inspired
   } else if (index == dialogue.length() || index == dialogue.length() + 1) {
     text(dialogue, x, y);
   }
+}
+
+void kyaSound(){
+    switch(randomSound(kyas.length)){
+      case 0:
+      kya1.play();
+      break;
+      case 1:
+      kya2.play();
+      break;
+      case 2:
+      kya3.play();
+      break;
+      case 3:
+      kya4.play();
+      break;
+      case 4:
+      kya5.play();
+      break;
+      case 5:
+      kya6.play();
+      break;
+    }
+}
+
+void oofSound(){
+    switch(randomSound(oofs.length)){
+      case 0:
+      oof1.play();
+      break;
+      case 1:
+      oof2.play();
+      break;
+      case 2:
+      oof3.play();
+      break;
+    }
+}
+
+void momHealthbar(){
+  fill(72, 64, 88);
+  noStroke();
+  rect((width / 2 - 250), 851, 42 + (47 *9), 79);
+  for (int x = 0; x < playerHealth; x++){
+    image(momHealth, (width / 2 - 250) + (47 * x), 856, 42, 74);     
+  }
+    image(momHealthBar, width / 2 - 270, 810, 497, 136);
+  for (int z = 0; z < brokenHearts; z++){
+    image(broken, (width / 2 - 250) + (z * 75.125), 950, 65.125, 65.125);
+  }
+}
+
+int randomSound(int lengthArray){
+  int random = int(random(0,lengthArray + 1));
+  return random;
+}
+
+void cameraTrack(){
+  noFill();
+  stroke(255);
+  rect(width - 269, height - 269, 269, 269);
+ 
+    image(jumpIcon, camX + (width - 269), camY + (height - 269));
 }
