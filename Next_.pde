@@ -61,6 +61,7 @@ Gif Grandma;
 Gif jumpIcon;
 Gif bigJump;
 Movie gameoverScene;
+Movie sadScene;
 PImage Train;
 PImage Location;
 PImage Box;
@@ -96,6 +97,9 @@ boolean Instruction = false;
 boolean Game = false;
 
 // Everything related to talking
+Dialogue lore;
+Dialogue defeat;
+
 boolean Scene1 = true;
 boolean scene1Time = true;
 boolean Scene2 = false;
@@ -114,6 +118,11 @@ boolean goodEnding = false;
 boolean Death = false;
 boolean firstDeath = true;
 boolean Defeat = false;
+boolean sadness = false;
+boolean sad1 = true;
+boolean sad2 = false;
+boolean sadnessTime = true;
+boolean train = false;
 
 boolean pauseCounter = true;
 boolean firstCalibration = true;
@@ -136,6 +145,27 @@ Timer attack;
 
 // Boss Fight Initialization
 bossFight Granny;
+Timer zoneDelay;
+boolean initialTimer = true;
+int zone = 0;
+Timer iFrames;
+PImage chargeLeft;
+PImage chargeRight;
+PImage chargeUp;
+PImage chargeDown;
+PImage rageLeft;
+PImage rageRight;
+PImage rageUp;
+PImage rageDown;
+PImage laserLeft;
+PImage laserRight;
+PImage laserUp;
+PImage laserDown;
+PImage Grandma1;
+PImage Grandma2;
+PImage Grandma3;
+PImage Grandma4;
+PImage Grandma5;
 
 PFont Deltarune; // font from deltarune
 
@@ -188,6 +218,7 @@ void setup() {
   jumpIcon = new Gif(this, "jumpIcon.gif");
   bigJump = new Gif(this, "Big Jump.gif");
   gameoverScene = new Movie(this, "TempGameOver.mp4");
+  sadScene = new Movie(this, "Sad.mp4");
   Train = loadImage("train.png");
   Location = loadImage("LocationSet.png");
   Box = loadImage("Box.png");
@@ -215,13 +246,37 @@ void setup() {
   suitor2Defeat = loadImage("suitor2Defeat.png");
   gameOverTitle = loadImage("gameOver.png");
   
+  // Dialogue Initialization
+  lore = new Dialogue();
+  defeat = new Dialogue();
+  
   //Timer Initalization
   autoScroll = new Timer(5000);
   pause = new Timer(3125);
   holdCalibration = new Timer(3000);
+  attack = new Timer(5000);
   
   //Boss initalization
   Granny = new bossFight();
+  zoneDelay = new Timer(6100);
+  iFrames = new Timer(4500);
+  chargeLeft = loadImage("demonheart_left.png");
+  chargeRight = loadImage("demonheart_right.png");
+  chargeUp = loadImage("demonheart_up.png");
+  chargeDown = loadImage("demonheart_down.png");
+  rageLeft = loadImage("demonheart_rage_left.png");
+  rageRight = loadImage("demonheart_rage_right.png");
+  rageUp = loadImage("demonheart_rage_up.png");
+  rageDown = loadImage("demonheart_rage_down.png");
+  laserLeft = loadImage("laser_left.png");
+  laserRight = loadImage("laser_right.png");
+  laserUp = loadImage("laser_up.png");
+  laserDown = loadImage("laser_down.png");
+  Grandma1 = loadImage("grandma1.png");
+  Grandma2 = loadImage("grandma2.png");
+  Grandma3 = loadImage("grandma3.png");
+  Grandma4 = loadImage("grandma4.png");
+  Grandma5 = loadImage("grandma5.png");
   
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
@@ -304,128 +359,51 @@ void startScreen(){
 }
 
 void loreScreens(){
-  if (Scene1) {
-    image(Location, 0,0, 1920,1080);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(255, 244, 85);
-    stroke(0);
-    rect(50,700,245,270);
-    image(Talking, 50, 700, 245,270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("MOM", 95, 1045);
-    textSize(32);
-    
-    displayText("Phew finally back in my dorm room.", 600, 900);
-    image(jumpIcon, 1800, 1000);
-    if (scene1Time) {
-      Dialogue1.play();
-      autoScroll.start();
-      scene1Time = false;
-    }
-    if (autoScroll.isFinished()) {
-      index = 0;
-      scene1Time = true;
-      Scene1 = false;
-      Scene2 = true;
-    }
-  }
-  
-  if (Scene2) {
-    image(Box, 0,0, 1920,1080);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(255, 244, 85);
-    stroke(0);
-    rect(50,700,245,270);
-    image(Talking, 50, 700, 245,270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("MOM", 95, 1045);
-    textSize(32);
-    displayText("Huh a box from back home just arrived!", 600, 900);
-    image(jumpIcon, 1800, 1000);
-    if (scene2Time) {
-      Dialogue2.play();
-      autoScroll.start();
-      scene2Time = false;
-    }
-    if (autoScroll.isFinished()) {
-      index = 0;
-      scene2Time = true;
-      Scene2 = false;
-      Scene3 = true;
-    }
-  }
-  
-  if (Scene3) {
-    image(openBox, 0,0, 1920,1080);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(255, 244, 85);
-    stroke(0);
-    rect(50,700,245,270);
-    image(Talking, 50, 700, 245,270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("MOM", 95, 1045);
-    textSize(32);
-    
-    displayText("'dont fall in love' huh", 600, 900);
-    image(jumpIcon, 1800, 1000);
-    if (scene3Time) {
-      boxOpen.play();
-      Dialogue3.play();
-      autoScroll.start();
-      scene3Time = false;
-    }
-    if (autoScroll.isFinished()) { //Temporary to get to game screen
-      index = 0;
-      scene3Time = true;
-      Scene3 = false;
-      Scene4 = true;
-    }
-  } 
-  
-  if (Scene4) {
-    image(Train, 0,0, 1920,1080);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(255);
-    stroke(0);      
-    rect(50,700,245,270);
-    image(Grandma, 50, 700, 245,270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("GRANDMA", 95, 1045);
-    textSize(32);
-    speed = 3;
-    displayText("I'm coming to see you after your classes!", 600, 900);
-    if (scene4Time) {
-      Bedroom.pause();
-      Dialogue4.play();
-      autoScroll.start();
-      scene4Time = false;
-    }
-
-    image(jumpIcon, 1800, 1000);
-    if (scene4Time) {
-      autoScroll.start();
-      scene4Time = false;
-    }
-    if (autoScroll.isFinished()){
-      index = 0;
-      scene4Time = true;
-      Scene4 = false;
-      Scene1= true;
-      Lore = false;
-      Instruction = true;
-    }
+  switch (lore.curScene){
+    case 1:
+    lore.sound(Dialogue1);
+    lore.displayScene(Talking,"Phew finally back in my dorm room.", "MOM", Location);
+    lore.moveScene(2);
+    break;
+    case 2:
+    lore.sound(Dialogue2);
+    lore.displayScene(Talking,"Huh a box from back home just arrived!", "MOM", Box);
+    lore.moveScene(3);
+    break;
+    case 3:
+    lore.sound(boxOpen);
+    lore.sound(Dialogue3);
+    lore.displayScene(Talking, "'dont fall in love' huh", "MOM", openBox);
+    lore.moveScene(4);
+    break;
+    case 4:
+    lore.playMovie(sadScene);
+    lore.moveScene(5);
+    break;
+    case 5:
+    lore.displayScene(Talking, "Ever since I was young/nI had to maintain my family honour.", "MOM", sadScene);
+    lore.moveScene(6);
+    break;
+    case 6:
+    lore.displayScene(Talking, "Eventually I got admitted to/nHarbin University in Northern China", "MOM", sadScene);
+    lore.moveScene(7);
+    break;
+    case 7:
+    lore.displayScene(Grandma, "I just wanted to say one thing to you before you leave…", "GRANDMA", Train);
+    lore.moveScene(8);
+    break;
+    case 8:
+    lore.displayScene(Grandma, "Just because I'm not there/ndoes not mean you can fall in love.", "GRANDMA", Train);
+    lore.moveScene(9);
+    break;
+    case 9:
+    lore.displayScene(Grandma, "Also, don't forget/nI'm going to visit you after your classes end.", "GRANDMA", Train);
+    lore.moveScene(10);
+    break;
+    case 10:
+    lore.displayScene(Talking, "Yes, Mother...", "MOM", Train);
+    lore.exitLore();
+    break;
   }
 }
 
@@ -636,7 +614,7 @@ void Suit1(){
   
   pauseCountdown();
   
-  if (firstAtk){
+  if (firstAtk && pause.isFinished()){
     attack = new Timer(Musician.atk()[0]);
     attack.start();
     firstAtk = false;
@@ -682,7 +660,7 @@ void Suit2(){
   
   pauseCountdown();
   
-  if (firstAtk){
+  if (firstAtk && pause.isFinished()){
     attack = new Timer(Rich.atk()[0]);
     attack.start();
     firstAtk = false;
@@ -728,7 +706,7 @@ void Suit3(){
   
   pauseCountdown();
   
-  if (firstAtk){
+  if (firstAtk && pause.isFinished()){
     attack = new Timer(Romantic.atk()[0]);
     attack.start();
     firstAtk = false;
@@ -761,18 +739,40 @@ void Suit3(){
 
 void deathScreen(){
   if (goodEnding){ //Currently Nullpointers when you move a little
+    if (initialTimer){
+      zoneDelay.start();
+      zone = Granny.chooseZone();
+      initialTimer = false;
+    }
     fill(0);
     rect(0,0,width,height);
     if (brokenHearts >= 0){
       for (int z = 0; z < brokenHearts; z++){
-        image(broken, (width / 2 - 250) + (z * 75.125), 950, 65.125, 65.125);
+        image(broken, (width / 2 - 250) + (z * 75.125), 900, 65.125, 65.125);
       }
     }
-    if(Granny.initiateAttack()){
-      brokenHearts--;
-    } else if (Granny.damaged()){
+    Granny.displayAttack(zone);
+    
+    if (zoneDelay.isFinished()){
+      Granny.damaged();
+      zoneDelay.start();
+      zone = Granny.chooseZone();
+    }
+    Granny.displayCharacter();
+    Granny.displayGrandma();
+    
+    if(Granny.detectCollision() && iFrames.isFinished()){
+      heartShatter.play();
+      if (brokenHearts != 0) {
+        brokenHearts--;
+      }
+      iFrames.start();
+      
+    } else if (!Granny.detectCollision()){
       //good ending
     }
+    fill(0,0,255);
+    rect(0, height - 100, 192 * Granny.giveHealth(), 100);
   } else {
       if (Scene1) {
       
@@ -994,6 +994,7 @@ void pauseCountdown(){
       text("2", width / 2, height /2);
     } else if (millis() - pause.giveTime() < 3000) {
       text("3", width / 2, height /2);
+      attack.start();
     }
   }
   
@@ -1001,4 +1002,16 @@ void pauseCountdown(){
 
 void movieEvent(Movie m) {
   m.read();
+}
+
+
+void keyPressed(){
+  if (key == 'm'){
+    brokenHearts = 3;
+    introSong.stop();
+    romanticBanger.play();
+    Calibrate = false;
+    Death = true;
+    goodEnding = true;
+  }
 }

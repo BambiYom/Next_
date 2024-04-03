@@ -1,14 +1,24 @@
 class bossFight{
   int [] attackZone;
   int hp;
-  Timer attackSpd;
-  int radius;
+  Timer chargeTime;
+  Timer laserTime;
+  float radius;
+  float [] playerHit;
+  float [] laserHit;
+  boolean chargin;
+  boolean lasering;
+  int laserMode;
   
   bossFight() {
     hp = 10;
     attackZone = new int[] {0,1,2,3,4,5,6,7};
-    attackSpd = new Timer (2500);
+    chargeTime = new Timer (3000);
+    laserTime = new Timer (2900);
     radius = 128;
+    chargin = true;
+    lasering = true;
+    laserMode = 0;
   }
   
   boolean damaged(){
@@ -20,12 +30,24 @@ class bossFight{
     }
   }
   
+  int giveHealth(){
+    return hp;
+  }
+  
+  
+  boolean charging(){
+    if (chargeTime.isFinished() && millis() - laserTime.giveTime() > 3000){
+      laserTime.start();
+      return false;
+    } 
+    return true;
+  }
   
   int chooseZone(){
     return attackZone[int(random(0,7))];
   }
   
-  float [] displayCharacter(){
+  void displayCharacter(){
   if (cam.available() == true) {
     cam.read();
   }
@@ -47,17 +69,14 @@ class bossFight{
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
         float y = faces[i].y + 165;
-        y = constrain(y, 165, 833);
         float x = faces[i].x + 626;
-        x = constrain(x, 626, 1294);
+        boundaryCheck(x,y);
         
     image(jumpIcon, x, y, 128,128);
-      float [] hitBox = new float [] {x, y, radius, radius};
-    return hitBox;
+      playerHit = new float [] {x, y, radius / 4, radius / 4};
   }
     }
   }
-  return null;
   }
   
 void boundaryCheck(float x, float y){
@@ -72,82 +91,44 @@ void boundaryCheck(float x, float y){
       }
 }
 
-  float [] displayAttack(int zone){
-    switch(zone){
+  void displayAttack(int zone){
+
+    switch (laserMode) {
       case 0:
-      fill(255,0,0);
-      float[] atk1 = new float [] {626, 165,1317,341}; // hitbox
-      rect(313,218, 217, 217); //face
-      fill(233,255,97);
-      rect(626, 165,1317,341); //laser
-      return atk1;
+      if (millis() - chargeTime.giveTime() > 3000 && chargin){
+        chargeTime.start();
+        chargin = false;
+        println("happens");
+      }
+      laserHit = new float [] {0,0,0,0};
+      charge(zone);
+      if (chargeTime.isFinished()){
+        chargin = true;
+        laserMode++;
+      }
+      break;
       case 1:
-      fill(255,0,0);
-      float[] atk2 = new float [] {626, 492,1317,341};
-      rect(313,540, 217, 217);
-      fill(233,255,97);
-      rect(626, 492,1317,341);
-      return atk2;
-      case 2:
-      float[] atk3 = new float [] {968.76, 165.45,341,1317};
-      fill(255,0,0);
-      rect(710,-73, 217, 217);
-      fill(233,255,97);
-      rect(968.76, 165.45,341,1317);
-      return atk3;
-      case 3:
-      float[] atk4 = new float [] {1294, 165.45,341,1317};
-      fill(255,0,0);
-      rect(1010, -73, 217, 217);  
-      fill(233,255,97);
-      rect(1294, 165.45,341,1317);
-      return atk4;
-      case 4:
-      float[] atk5 = new float [] {-23, 165,1317,341};
-      fill(255,0,0);
-      rect(1345,218, 217, 217);
-      fill(233,255,97);
-      rect(-23, 165,1317,341);
-      return atk5;
-      case 5:
-      float[] atk6 = new float [] {-23, 492,1317,341};
-      fill(255,0,0);
-      rect(1345, 540, 217, 217);
-      fill(233,255,97);
-      rect(-23, 492,1317,341);
-      return atk6;
-      case 6:
-      float[] atk7 = new float [] {960, -484,341, 1317};
-      fill(255,0,0);
-      rect(710,852, 217, 217);
-      fill(233,255,97);
-      rect(960, -484,341, 1317);
-      return atk7;
-      case 7:
-      float[] atk8 = new float [] {1300, -484,341, 1317};
-      fill(255,0,0);
-      rect(1010,852, 217, 217);
-      fill(233,255,97);
-      rect(1300, -484,341, 1317);
-      return atk8;
+      if (millis() - laserTime.giveTime() > 3000 && lasering){
+        laserTime.start();
+        lasering = false;
+      }
+      laser(zone);
+      if (laserTime.isFinished()){
+        lasering = true;
+        laserMode--;
+      }
     }
-    return null;
   }
-  boolean detectCollision(float [] atkHitbox, float [] playerHitbox){
-    if (rectRect(playerHitbox[0], playerHitbox[1], playerHitbox[2], playerHitbox[3], atkHitbox[0], atkHitbox[1], atkHitbox[2], atkHitbox[3])){
-      println("hit");
+  
+  
+  
+  boolean detectCollision(){
+    if (rectRect(playerHit[0], playerHit[1], playerHit[2], playerHit[3], laserHit[0], laserHit[1], laserHit[2], laserHit[3])){
       return true;
     }
     return false;
   }
   
-  boolean initiateAttack(){
-    if (detectCollision(displayAttack(chooseZone()), displayCharacter())) {
-      return true;
-    }
-    return false;
-  }
-}
 
 boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) { // Hit Collision of two rectangles https://www.jeffreythompson.org/collision-detection/rect-rect.php
 
@@ -160,4 +141,100 @@ boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2
         return true;
   }
   return false;
+}
+
+void displayGrandma(){
+  if (hp == 10 || hp == 9){
+    image(Grandma1, 18,723, 258,318);
+  }
+  if (hp == 8 || hp == 7){
+    image(Grandma2, 18,723, 258,318);
+  }
+  if (hp == 6 || hp == 5){
+    image(Grandma3, 18,723, 258,318);
+  }
+  if (hp == 4 || hp == 3){
+    image(Grandma4, 18,723, 258,318);
+  }
+  if (hp == 2 || hp == 1){
+    image(Grandma5, 18,723, 258,318);
+  }
+}
+
+void charge(int zone){
+  switch(zone){
+      case 0:
+      image(chargeLeft,313,218, 217, 217); //face
+      break;
+      case 1:
+      
+      image(chargeLeft,313,540, 217, 217);
+      break;
+      case 2:
+      image(chargeUp,688,-73, 217, 217);
+      break;
+      case 3:
+      image(chargeUp,1010, -73, 217, 217);  
+      break;
+      case 4:
+      image(chargeRight,1345,218, 217, 217);
+      break;
+      case 5:
+      image(chargeRight,1345, 540, 217, 217);
+      break;
+      case 6:
+      fill(0,255,0);
+      image(chargeDown,688,852, 217, 217);
+      break;
+      case 7:
+      fill(0,255,0);
+      image(chargeDown,1010,852, 217, 217);
+      break;
+    }
+  }
+
+void laser(int zone){
+  switch(zone){
+      case 0:
+      laserHit = new float [] {626, 165,1317,341}; // hitbox
+      image(rageLeft,313,218, 217, 217); //face
+      image(laserLeft, 626, 165,1317,341); //laser
+      break;
+      case 1:
+      laserHit = new float [] {626, 492,1317,341};
+      image(rageLeft,313,540, 217, 217);
+      image(laserLeft,626, 492,1317,341);
+      break;
+      case 2:
+      laserHit = new float [] {626, 165,341,1317};
+      image(rageUp,688,-73, 217, 217);
+      image(laserUp,626, 165,341,1317);
+      break;
+      case 3:
+      laserHit = new float [] {953, 165,341,1317};
+      image(rageUp,1010, -73, 217, 217);  
+      image(laserUp,953, 165,341,1317);
+      break;
+      case 4:
+      laserHit = new float [] {-23, 165,1317,341};
+      image(rageRight,1345,218, 217, 217);
+      image(laserRight,-23, 165,1317,341);
+      break;
+      case 5:
+      laserHit = new float [] {-23, 492,1317,341};
+      image(rageRight,1345, 540, 217, 217);
+      image(laserRight,-23, 492,1317,341);
+      break;
+      case 6:
+      laserHit = new float [] {626, -485,341, 1317};
+      image(rageDown,688,852, 217, 217);
+      image(laserDown,626, -485,341, 1317);
+      break;
+      case 7:
+      laserHit = new float [] {953, -485,341, 1317};
+      image(rageDown,1010,852, 217, 217);
+      image(laserDown,953, -485,341, 1317);
+      break;
+    }
+  }
 }
