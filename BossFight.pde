@@ -9,6 +9,8 @@ class bossFight{
   boolean chargin;
   boolean lasering;
   int laserMode;
+  float lastX;
+  float lastY;
   
   bossFight() {
     hp = 10;
@@ -51,6 +53,8 @@ class bossFight{
   if (cam.available() == true) {
     cam.read();
   }
+  float x;
+  float y;
     // Update the OpenCV object with the latest webcam image
   opencv.loadImage(cam);
   noFill();
@@ -68,14 +72,30 @@ class bossFight{
     for (int i = 0; i < 1; i++) {
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
-        float y = faces[i].y + 165;
-        float x = faces[i].x + 626;
+        y = faces[i].y + 165;
+        x = faces[i].x + 626;
         boundaryCheck(x,y);
-        
+        lastX = x;
+        lastY = y;
+        if (x - lastX > 200 || y - lastY > 200){
+          x = lastX;
+          y = lastY;
+        }
+    if (!iFrames.isFinished()){
+      tint(255, 201, 74);
+    } else if (iFrames.isFinished()){
+      noTint();
+    }
     image(jumpIcon, x, y, 128,128);
-      playerHit = new float [] {x, y, radius / 4, radius / 4};
+    noTint();
+      playerHit = new float [] {x, y, radius / 6, radius / 6};
+      
   }
     }
+  } else if (faces.length == 0){
+    x = lastX;
+    y = lastY;
+    playerHit = new float [] {x, y, radius / 6, radius / 6};
   }
   }
   
