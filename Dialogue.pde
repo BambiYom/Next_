@@ -54,6 +54,7 @@ class Dialogue{
       index = 0;
       Lore = false;
       Instruction = true;
+      Bedroom.stop();
     }
   }
 }
