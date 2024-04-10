@@ -19,6 +19,7 @@ Capture cam;
 // Create a variable to store an instance of the OpenCV class
 OpenCV opencv;
 
+//All sounds
 SoundFile introSong;
 SoundFile Calibration;
 SoundFile Bedroom;
@@ -42,11 +43,15 @@ SoundFile kya5;
 SoundFile kya6;
 SoundFile [] kyas;
 SoundFile musicianBanger;
+
+//Camera Tracking Related
 int prevY = -1000;
 int prevX;
 float camX;
 float camY;
 int storedW;
+
+//Gameplay Related
 int jumpDelay;
 int atkDelay;
 int minSize = 50;
@@ -55,6 +60,8 @@ int energyCharge = 0;
 int chargingMax;
 int playerHealth = 10;
 int brokenHearts = 0;
+
+//Gifs and Animations
 Gif Opening;
 Gif Talking;
 Gif Grandma;
@@ -62,6 +69,8 @@ Gif jumpIcon;
 Gif bigJump;
 Movie gameoverScene;
 Movie sadScene;
+
+//Images
 PImage Train;
 PImage Location;
 PImage Box;
@@ -90,6 +99,8 @@ PImage gameOverTitle;
 
 PImage heart;
 PImage broken;
+
+//Game States
 boolean Calibrate = true;
 boolean Start = false;
 boolean Lore = false;
@@ -124,10 +135,12 @@ boolean sad2 = false;
 boolean sadnessTime = true;
 boolean train = false;
 
+// Pause and Calibration Variables
 boolean pauseCounter = true;
 boolean firstCalibration = true;
 Timer pause;
 
+// Anything related to the Suitors Stats
 boolean firstAtk = true;
 int atkSpeed1 = 3500;
 boolean suitor1 = true;
@@ -180,13 +193,14 @@ int index = 0;
 
 
 void setup() {
-  size(1920,1080);
-  background(100, 50 , 50);
+  size(1920,1080); //Setup Size
+  background(100, 50 , 50); //Loading Screen default Colour
   // Populate an array with a list of available capture devices
   String[] cameras = Capture.list();
   // Initialize the camera object using the first element of the list denoted by cameras[0]
   cam = new Capture(this, cameras[0]);
   
+  //Initializing all the sounds here
   introSong = new SoundFile(this, "a3_intromusic_FINAL-V1.mp3");
   Calibration = new SoundFile(this, "302-CALIBRATION DONE.wav");
   Bedroom = new SoundFile(this, "bedroom-music-v2.mp3");
@@ -278,8 +292,10 @@ void setup() {
   Grandma4 = loadImage("grandma4.png");
   Grandma5 = loadImage("grandma5.png");
   
+  //Setting the game Font
   Deltarune = createFont("undertale-deltarune-text-font-extended.ttf", 64);
   textFont(Deltarune);
+  // Setting the frameRate for playbacks
   frameRate(30);
    // Start capturing the images from the camera
   cam.start();
@@ -289,21 +305,24 @@ void setup() {
   
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   
-  
+  // Create new suitor classes
   Musician = new suitor(Suitor1, atkSpeed1, 1, 4);
   Rich = new suitor(Suitor2, atkSpeed2, 1, 8);
   Romantic = new suitor(Suitor3, atkSpeed3, 1, 50);
   
+  //Set the playing behaviour of all playbacks
   Opening.loop();
   Talking.loop();
   jumpIcon.loop();
   introSong.loop();
   Grandma.loop();
   bigJump.loop();
+  //Set volumes
   Bedroom.amp(0.5);
   musicianBanger.amp(0.5);
 }
 void draw() {
+  //Handle all the gameStates here
   if (Calibrate) {
     calibrate();
   }
@@ -332,25 +351,25 @@ void draw() {
   }
 }
 
-void calibrate(){
-  image(calibrateIns, 0, 0);
-  if (cam.available() == true) {
+void calibrate(){ // State where we check if you are standing in the proper location
+  image(calibrateIns, 0, 0); // Set the background to the Calibration Instruction Screen
+  if (cam.available() == true) { // Check if Camera is available
   cam.read();
   }
   imageMode(CENTER);
-  image(cam, width / 2, height / 2, cam.width, cam.height);
+  image(cam, width / 2, height / 2, cam.width, cam.height); //Display Camera
   imageMode(CORNER);
   
-  if (calibrated()){
+  if (calibrated()){ //Function to check if calibrated than it changes states
     Calibration.play();
     Calibrate = false;
     Start = true;
   }
 }
 
-void startScreen(){
-  image(Opening,0,0, 1920, 1080);
-  if (Jump()) {
+void startScreen(){ // State where we introduce the game title
+  image(Opening,0,0, 1920, 1080); // Sets background
+  if (Jump()) { //Checks for jumps if jumped than it changes states
     introSong.pause();
     Bedroom.loop();
     Start = false;
@@ -358,8 +377,14 @@ void startScreen(){
   }
 }
 
-void loreScreens(){
+void loreScreens(){ // State where all of the initial Dialogue happens
   switch (lore.curScene){
+  /* Key Functions for the Dialogue Class:
+        .sound(soundFile) is used before display scene to start all the sounds that should be played in the scene
+        .displayScene(Picture of Person, Dialogue, Name of Person, Background Image) is used to setup the scene what they should say who is saying and where
+        .moveScene(newScene) changes and resets dialogue states and changes the current scene
+        .endLore() changes the state from Lore to Game
+        For more information check the Dialogue Class File*/
     case 1:
     lore.sound(Dialogue1);
     lore.displayScene(Talking,"Phew finally back in my dorm room.", "MOM", Location);
@@ -381,11 +406,11 @@ void loreScreens(){
     lore.moveScene(5);
     break;
     case 5:
-    lore.displayScene(Talking, "Ever since I was young/nI had to maintain my family honour.", "MOM", sadScene);
+    lore.displayScene(Talking, "I always had to maintain my family honour.", "MOM", sadScene);
     lore.moveScene(6);
     break;
     case 6:
-    lore.displayScene(Talking, "Eventually I got admitted to/nHarbin University in Northern China", "MOM", sadScene);
+    lore.displayScene(Talking, "Eventually I got admitted to university far away", "MOM", sadScene);
     lore.moveScene(7);
     break;
     case 7:
@@ -393,14 +418,22 @@ void loreScreens(){
     lore.moveScene(8);
     break;
     case 8:
-    lore.displayScene(Grandma, "Just because I'm not there/ndoes not mean you can fall in love.", "GRANDMA", Train);
+    lore.displayScene(Grandma, "Just because I'm not there...", "GRANDMA", Train);
     lore.moveScene(9);
     break;
     case 9:
-    lore.displayScene(Grandma, "Also, don't forget/nI'm going to visit you after your classes end.", "GRANDMA", Train);
+    lore.displayScene(Grandma, "Does not mean you can fall in love.", "GRANDMA", Train);
     lore.moveScene(10);
     break;
     case 10:
+    lore.displayScene(Grandma, "Also, don't forget...", "GRANDMA", Train);
+    lore.moveScene(11);
+    break;
+    case 11:
+    lore.displayScene(Grandma, "I'm going to visit you after your classes end.", "GRANDMA", Train);
+    lore.moveScene(12);
+    break;
+    case 12:
     lore.displayScene(Talking, "Yes, Mother...", "MOM", Train);
     lore.exitLore();
     break;
@@ -409,14 +442,18 @@ void loreScreens(){
 
 void instructionScreen(){
   fill(0);
-  rect(0,0, width, height);
-  if (Scene1) {
+  rect(0,0, width, height); // Fill the screen with a black wall
+  /* General Structure:
+        Scene State set by if (Scene#)
+        displayText(Dialogue, xPos, yPos) Function types out the text at the speed of 2 words
+        if(scene#Time) is the first time autoscroll starter so its not reset continuously
+        display any other elements in between here
+        if(autoScroll.isFinised()) changes the scene state
+        For more information about displayText() look around lines 900-1000*/
+  if (Scene1) { 
     fill(255);
-    displayText("In this game you fill up the charge bar by jumping", 400, 900);
-    imageMode(CENTER);
-    
-    imageMode(CORNER);
-    if (scene1Time) {
+    displayText("In this game you fill up the charge bar by jumping", 400, 900); 
+    if (scene1Time) { 
       autoScroll.start();
       scene1Time = false;
     }
@@ -487,6 +524,8 @@ void instructionScreen(){
 }
 
 void defeatScreen(){
+  /* Whenever a suitor is defeated this dialogue is played
+      Structure is similar to Lore Dialogue Class*/
   if (MusicianDialogue) {
     image(suitor1Defeat,0,0);
     fill(0);
@@ -508,7 +547,7 @@ void defeatScreen(){
     }
     displayText("But will you at least buy my latest single!", 600, 900);
     image(jumpIcon, 1800, 1000);
-    if (autoScroll.isFinished()){
+    if (autoScroll.isFinished()){ // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
       MusicianDialogue = false;
       suitor1 = false;
       suitor2 = true;
@@ -543,7 +582,7 @@ void defeatScreen(){
       autoScroll.start();
       scene4Time = false;
     }
-    if (autoScroll.isFinished()){
+    if (autoScroll.isFinished()){ // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
       index = 0;
       RichDialogue = false;
       romanticBanger.loop();
@@ -557,36 +596,36 @@ void defeatScreen(){
 }
 
 void gameScreen(){
-  image(gameBG,0,0);
-  image(suitorHealthBar, width / 2 - 125, 110, 277, 108);
+  image(gameBG,0,0); //Sets Background
+  image(suitorHealthBar, width / 2 - 125, 110, 277, 108); // Adds the Healthbar for the suitors
   fill(0);
-  rect(0, 800, 1920, 280);
+  rect(0, 800, 1920, 280); //Creates the bottom black bar as a background for graphical elements
   noStroke();
   fill(131, 222, 241);
-  rect(0, height- 269, 269, 269);
-  if (Jump() && !pauseCounter){
+  rect(0, height- 269, 269, 269); //Fills the back of the Player Healthbar
+  if (Jump() && !pauseCounter){ // Whenever there's a jump and the came is not paused energy is incremented 20
     energyCharge = energyCharge + 20;
   }
-  chargingMax = constrain(energyCharge, 0, 100);
-  fill(chargingMax, 0, 255 - chargingMax);
-  rect(0, 872 - 105, chargingMax * 20, 25);
-  image(Bolt, 5, 730, 30, 30);
-  image(chargeBar, 0, 760, 1920, 40);
-    if (brokenHearts == 0){
+  chargingMax = constrain(energyCharge, 0, 100); // Constrains the bar to 100 max
+  fill(chargingMax, 0, 255 - chargingMax); // Changes the colour of the bar according to the amount of charge
+  rect(0, 872 - 105, chargingMax * 20, 25); // draws the bar
+  image(Bolt, 5, 730, 30, 30); // Draws the bolt symbol beside the charge bar
+  image(chargeBar, 0, 760, 1920, 40); // Draws the charge bar on top of the charge
+    if (brokenHearts == 0){ // if no broken hearts than its an angry face
     image(angyFace, 0, height - 259, 259,259);
   }
-  if (brokenHearts == 1){  
+  if (brokenHearts == 1){  // if one broken heart than its a happy face
     image(happyFace, 0, height - 259, 259,259);
   }
-  if (brokenHearts == 2){
+  if (brokenHearts == 2){ // if two broken hearts than its an excited face
     image(excitedFace,0, height - 259, 259,259);
   }
-  image(momFrame,0, height - 269, 269, 269);
+  image(momFrame,0, height - 269, 269, 269); // Healthbar Frame for mom
   // Display the webcam image
-  cameraTrack();
-  momHealthbar();
+  cameraTrack(); // Display your face's position in the bottom right corner
+  momHealthbar(); //display your current health
   
-    if (suitor1) {
+    if (suitor1) { //states about which suitor you are facing right now
     Suit1();
   }
   if (suitor2) {
@@ -600,6 +639,8 @@ void gameScreen(){
 }
 
 void Suit1(){
+  /* General Structure of Suitors:
+        Suitor.display(x, y, */
   Musician.display(width/2, height/2 - 30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
