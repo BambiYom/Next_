@@ -1,18 +1,18 @@
 class bossFight{
-  int [] attackZone;
-  int hp;
-  Timer chargeTime;
-  Timer laserTime;
-  float radius;
-  float [] playerHit;
-  float [] laserHit;
-  boolean chargin;
-  boolean lasering;
-  int laserMode;
-  float lastX;
-  float lastY;
+  int [] attackZone; // denotes there are 8 zones where they can attack from
+  int hp; // denotes the amount of health the boss has remaining
+  Timer chargeTime; // the amount of time it takes to charge an attack
+  Timer laserTime; // the amount of time the last lasts 
+  float radius; // Character distance from left to right
+  float [] playerHit; // player hurtbox
+  float [] laserHit; // laser hitbox
+  boolean chargin; // if its charging
+  boolean lasering; // if its shooting
+  int laserMode; // what mode its in rn
+  float lastX; // previous X
+  float lastY; // previous Y
   
-  bossFight() {
+  bossFight() { // setup the following values
     hp = 10;
     attackZone = new int[] {0,1,2,3,4,5,6,7};
     chargeTime = new Timer (3000);
@@ -23,7 +23,7 @@ class bossFight{
     laserMode = 0;
   }
   
-  boolean damaged(){
+  boolean damaged(){ // reduce hp by one and if you are dead it return true
     hp--;
     if (hp == 0) {
       return true;
@@ -32,12 +32,12 @@ class bossFight{
     }
   }
   
-  int giveHealth(){
+  int giveHealth(){ // returns health probably not neccesary since you can do class.hp()
     return hp;
   }
   
   
-  boolean charging(){
+  boolean charging(){ // check to see if you are charging
     if (chargeTime.isFinished() && millis() - laserTime.giveTime() > 3000){
       laserTime.start();
       return false;
@@ -45,11 +45,11 @@ class bossFight{
     return true;
   }
   
-  int chooseZone(){
+  int chooseZone(){ // choose a random zone
     return attackZone[int(random(0,7))];
   }
   
-  void displayCharacter(){
+  void displayCharacter(){ // show the character on screen, and track its movement
   if (cam.available() == true) {
     cam.read();
   }
@@ -60,7 +60,7 @@ class bossFight{
   noFill();
   stroke(255);
   strokeWeight(5);
-  rect(626,165,668,668);
+  rect(626,165,668,668); // draw a rectangle  where the character will be placed
   strokeWeight(1);
   // Detect faces in the webcam image using the face classifier
   // The detect function returns an array of java.awt.Rectangle objects with the location,
@@ -75,32 +75,32 @@ class bossFight{
         y = faces[i].y + 165;
         x = faces[i].x + 626;
         boundaryCheck(x,y);
-        lastX = x;
-        lastY = y;
-        if (x - lastX > 200 || y - lastY > 200){
-          x = lastX;
+        lastX = x; //tracks previous positions does not work correctly yet
+        lastY = y; //tracks previous positions does not work correctly yet
+        if (x - lastX > 200 || y - lastY > 200){ //tracks previous positions does not work correctly yet
+          x = lastX; 
           y = lastY;
         }
-    if (!iFrames.isFinished()){
+    if (!iFrames.isFinished()){ // Tints your character as long you have iframes remaining
       tint(255, 201, 74);
     } else if (iFrames.isFinished()){
       noTint();
     }
-    image(jumpIcon, x, y, 128,128);
+    image(jumpIcon, x, y, 128,128); // place the icon
     noTint();
-      playerHit = new float [] {x, y, radius / 6, radius / 6};
+      playerHit = new float [] {x, y, radius / 6, radius / 6}; //set hitbox at that spot
       
   }
     }
-  } else if (faces.length == 0){
+  } else if (faces.length == 0){ // case if player face is lost
     x = lastX;
     y = lastY;
-    playerHit = new float [] {x, y, radius / 6, radius / 6};
+    playerHit = new float [] {x, y, radius / 6, radius / 6}; 
   }
   }
   
-void boundaryCheck(float x, float y){
-          if (x > 1294 - radius) { // borrowed from Circle Collision Example
+void boundaryCheck(float x, float y){ // Checks to see if you ever hit the boundary of the box
+          if (x > 1294 - radius) { 
         x = 1294 - radius;
       } else if (x < 626 + radius) {
         x = 626 + radius;
@@ -111,29 +111,29 @@ void boundaryCheck(float x, float y){
       }
 }
 
-  void displayAttack(int zone){
+  void displayAttack(int zone){ // Show the Laser and Charge Period
 
     switch (laserMode) {
-      case 0:
-      if (millis() - chargeTime.giveTime() > 3000 && chargin){
+      case 0: // Case when Charging
+      if (millis() - chargeTime.giveTime() > 3000 && chargin){ // Starts charge timer and prevents it from resetting multiple times
         chargeTime.start();
         chargin = false;
         println("happens");
       }
-      laserHit = new float [] {0,0,0,0};
-      charge(zone);
-      if (chargeTime.isFinished()){
+      laserHit = new float [] {0,0,0,0}; // Set Laser hitbox
+      charge(zone); //places the charge head at the correct zone
+      if (chargeTime.isFinished()){ //change mode when done charging
         chargin = true;
         laserMode++;
       }
       break;
       case 1:
-      if (millis() - laserTime.giveTime() > 3000 && lasering){
+      if (millis() - laserTime.giveTime() > 3000 && lasering){ // starts laser timer and prevents it from resetting multiple times
         laserTime.start();
         lasering = false;
       }
-      laser(zone);
-      if (laserTime.isFinished()){
+      laser(zone); // places laser in correct zone
+      if (laserTime.isFinished()){ // changes mode when done lasering
         lasering = true;
         laserMode--;
       }
@@ -142,7 +142,7 @@ void boundaryCheck(float x, float y){
   
   
   
-  boolean detectCollision(){
+  boolean detectCollision(){ // detects when a player is hit
     if (rectRect(playerHit[0], playerHit[1], playerHit[2], playerHit[3], laserHit[0], laserHit[1], laserHit[2], laserHit[3])){
       return true;
     }
@@ -150,7 +150,7 @@ void boundaryCheck(float x, float y){
   }
   
 
-boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) { // Hit Collision of two rectangles https://www.jeffreythompson.org/collision-detection/rect-rect.php
+boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) { // Hit Collision of two rectangles [1]
 
   // are the sides of one rectangle touching the other?
 
@@ -163,7 +163,7 @@ boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2
   return false;
 }
 
-void displayGrandma(){
+void displayGrandma(){ // Changes grandma based on her health
   if (hp == 10 || hp == 9){
     image(Grandma1, 18,723, 258,318);
   }
@@ -181,8 +181,8 @@ void displayGrandma(){
   }
 }
 
-void charge(int zone){
-  switch(zone){
+void charge(int zone){ // places the charge face in the given zone
+  switch(zone){ // depending on the zone the head is placed in a different spot
       case 0:
       image(chargeLeft,313,218, 217, 217); //face
       break;
@@ -213,8 +213,8 @@ void charge(int zone){
     }
   }
 
-void laser(int zone){
-  switch(zone){
+void laser(int zone){ // places the laser appropriately connected to the zone and changes the face to angry
+  switch(zone){ // position based on zone
       case 0:
       laserHit = new float [] {626, 165,1317,341}; // hitbox
       image(rageLeft,313,218, 217, 217); //face
@@ -258,3 +258,6 @@ void laser(int zone){
     }
   }
 }
+
+//Citations:
+//[1] Jeffery Thompson. RECTANGLE/RECTANGLE. Retrieved April 3rd 2024 from https://www.jeffreythompson.org/collision-detection/rect-rect.php

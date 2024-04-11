@@ -353,8 +353,8 @@ void draw() {
 
 void calibrate(){ // State where we check if you are standing in the proper location
   image(calibrateIns, 0, 0); // Set the background to the Calibration Instruction Screen
-  if (cam.available() == true) { // Check if Camera is available
-  cam.read();
+  if (cam.available() == true) { // Check if Camera is available [1]
+  cam.read(); //[1]
   }
   imageMode(CENTER);
   image(cam, width / 2, height / 2, cam.width, cam.height); //Display Camera
@@ -640,7 +640,17 @@ void gameScreen(){
 
 void Suit1(){
   /* General Structure of Suitors:
-        Suitor.display(x, y, */
+        Suitor#.display(x, y, width, height) this function just displays the suitor
+        if (attacked()) is a function that when you get attacked it plays a sound, shows a fist, and mutates their hp variable
+        for (int i = 0; i < Musician.Health(); i++) produces the health bar on the screen for the suitors health
+        pauseCountDown(); means that after all of these elemnts are displayed if pause hasn't happened yet than it will happen
+        if (firstAtk && pause.isFinished())initiates the first attack countdown
+        if (Suitor#.isDead()) is a check when the Suitor is dead which is when its health is 0
+        if (attack.isFinished() && pause.isFinished()) identifies when the suitor completes an attack with its associated behaviours usually just reducing health to 0 but if health == 0 it will deathCheck()
+        attack.start() after an attack is completed to reset the cycle
+        curSize = lerp(curSize, curSize + ((millis()- attack.giveTime()) / 2), 0.2); is a function that affects the size of the heart as the suitor charges up an attack
+        This applies to all 3 suitors and uses mainly the Suitor class which you can check for more details
+        */
   Musician.display(width/2, height/2 - 30, 521, 521);
   float curSize = 65.125;
   if (attacked()){
@@ -779,102 +789,102 @@ void Suit3(){
 }
 
 void deathScreen(){
-  if (goodEnding){ //Currently Nullpointers when you move a little
-    if (initialTimer){
-      zoneDelay.start();
-      zone = Granny.chooseZone();
+  if (goodEnding){ // when you are defeated at the 3rd Suitor you go here
+    if (initialTimer){ // Starts the initial timers to begin the fight
+      zoneDelay.start(); // Zone starting
+      zone = Granny.chooseZone(); // Set the zone to a new zone
       initialTimer = false;
     }
     fill(0);
-    rect(0,0,width,height);
-    if (brokenHearts >= 0){
-      for (int z = 0; z < brokenHearts; z++){
+    rect(0,0,width,height); // Set the background to black
+    if (brokenHearts >= 0){ 
+      for (int z = 0; z < brokenHearts; z++){ // Display the current amount of broken hearts
         image(broken, (width / 2 - 250) + (z * 75.125), 900, 65.125, 65.125);
       }
     }
-    Granny.displayAttack(zone);
+    Granny.displayAttack(zone); //Show where the attack is happening at in the chosen zone
     
-    if (zoneDelay.isFinished()){
-      Granny.damaged();
-      zoneDelay.start();
-      zone = Granny.chooseZone();
+    if (zoneDelay.isFinished()){ // When Zone timer is finished
+      Granny.damaged(); // Granny takes damage
+      zoneDelay.start(); // We set a new zone Timer
+      zone = Granny.chooseZone(); // and we choose a new zone
     }
-    Granny.displayCharacter();
-    Granny.displayGrandma();
+    Granny.displayCharacter(); // Show the character on the screen in the proper spot for more details refer to BossFight Class
+    Granny.displayGrandma(); // Display the face of Grandma for more details look at the BossFight Class
     
-    if(Granny.detectCollision() && iFrames.isFinished()){
-      heartShatter.play();
+    if(Granny.detectCollision() && iFrames.isFinished()){ // if you get hit by granny and you don't have iFrames
+      heartShatter.play(); // play damage sound
       if (brokenHearts != 0) {
-        brokenHearts--;
+        brokenHearts--; //lose a heart
       }
-      iFrames.start();
+      iFrames.start(); // reset iFrames
       
-    } else if (!Granny.detectCollision()){
+    } else if (!Granny.detectCollision()){ // incomplete code fragment
       //good ending
     }
     fill(0,0,255);
-    rect(0, height - 100, 192 * Granny.giveHealth(), 100);
+    rect(0, height - 100, 192 * Granny.giveHealth(), 100); // display the Grandma's health or Timer
   } else {
       if (Scene1) {
       
-        if (firstDeath){
+        if (firstDeath){ // Start autoscroll and play the cutscene once
           gameoverScene.play();
           autoScroll.start();
           firstDeath = false;
         }
-        image(gameoverScene,0,0);
-        if(autoScroll.isFinished()){
+        image(gameoverScene,0,0); // show the animation
+        if(autoScroll.isFinished()){ // move scene states
           Scene1 = false;
           Scene2 = true;
       }
     }
-    if (Scene2) {
+    if (Scene2) { 
       fill(0);
-      rect(0,0, width, height);
+      rect(0,0, width, height); //Set a black screen
       imageMode(CENTER);
-      image(gameOverTitle, width/2, height /2);
+      image(gameOverTitle, width/2, height /2); // Gameover Title Card
       imageMode(CORNER);
     }
   }
   
 }
 boolean Jump(){
-    if (cam.available() == true) {
+    if (cam.available() == true) { // Check camera availability [1]
     cam.read();
   }
-    // Update the OpenCV object with the latest webcam image
+    // Update the OpenCV object with the latest webcam image [1]
   opencv.loadImage(cam);
   
 
   // Detect faces in the webcam image using the face classifier
   // The detect function returns an array of java.awt.Rectangle objects with the location,
   // width, and height of each detected object.
-  Rectangle[] faces = opencv.detect();
+  Rectangle[] faces = opencv.detect(); //[1]
   // Loop through all the detected faces
   
   if (faces.length > 0){
     for (int i = 0; i < 1; i++) {
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
-        int y = faces[i].y;
-        int x = faces[i].x;
-        int w = faces[i].width;
-        if (prevY == -1000) {
+        int y = faces[i].y; //[1]
+        int x = faces[i].x; //[1]
+        int w = faces[i].width; //[1]
+        if (prevY == -1000) { // Set first prevY and prevX's
           prevY = y;
           prevX = x;
         }
-        camY = lerp(prevY, y, 0.1);
-        camX = lerp(prevX, x, 0.1);
+        camY = lerp(prevY, y, 0.1); // attempts to smoothen the experience
+        camX = lerp(prevX, x, 0.1); // attempts to smoothen the experience
         
-        if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16) { // tracks if you lift your head 40 pixels up
+        if(y < prevY - 35 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16) { // tracks if you jump
           println("jump");
           Jump.play();
           jumpDelay = millis();
           return true;
-        } else if (prevY - 35 < y && y < prevY - 32 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16){
+        } else if (prevY - 35 < y && y < prevY - 32 && faces[i] != null && millis() - jumpDelay >= 550 && w <= storedW + 16 && w >= storedW - 16){ // behaviour for false jump not fleshed out yet
           
         }
-        if (y != 0) {
+        if (y != 0) { // set prevY, and prevX
           prevY = y;
           prevX = x;
         }
@@ -884,8 +894,8 @@ boolean Jump(){
   return false;
 }
 
-boolean attacked(){
-  if (millis() - atkDelay > 2000 && chargingMax == 100) {
+boolean attacked(){ // checks if attacked
+  if (millis() - atkDelay > 2000 && chargingMax == 100) { // if time since delay is greater than 2000 and Charge is 100 you attack
     println("attacked");
     atkDelay = millis();
     return true;
@@ -894,12 +904,12 @@ boolean attacked(){
 }
 
 boolean calibrated(){
-  if (cam.available() == true) {
+  if (cam.available() == true) { // check camera availability [1]
     cam.read();
   }
     // Update the OpenCV object with the latest webcam image
-  opencv.loadImage(cam);
-  if (firstCalibration) {
+  opencv.loadImage(cam); // [1]
+  if (firstCalibration) { //start timer
     holdCalibration.start();
     firstCalibration = false;
   }
@@ -913,26 +923,26 @@ boolean calibrated(){
     for (int i = 0; i < 1; i++) {
       if (faces[i].width > minSize && faces[i].height > minSize){ // only faces at a minimum size are tracked to make sure false faces don't get picked up
         // Get the coordinates and dimensions of the currently tracked face
-        int x = faces[i].x;
-        int w = faces[i].width;
-        int y = faces[i].y;
+        int x = faces[i].x; //[1]
+        int w = faces[i].width; //[1]
+        int y = faces[i].y; //[1]
         rectMode(CENTER);
         stroke(255,0,0);
         strokeWeight(5);
         noFill();
-        rect(x + 680, y + 325, 65, 65);
+        rect(x + 680, y + 325, 65, 65); // put rectangle on your face
         rectMode(CORNER);
         strokeWeight(1);
-        if (w > minSize && w < 65 && faces[i] != null) {
-          pauseCountdown();
-          if (holdCalibration.isFinished()){
-            storedW = w;
-            pauseCounter = true;
+        if (w > minSize && w < 65 && faces[i] != null) { // check if you are far away enough but not too far away for the camera to pick you up
+          pauseCountdown(); // start a pause timer counting down from 3 to 1
+          if (holdCalibration.isFinished()){ // calibrated successfully long enough
+            storedW = w; // store your w to refer to when checking for jumps to ensure that you are still at the optimal distance
+            pauseCounter = true; // pause becomes true for the sake of pausing later
             return true;
           }
         } else {
-          holdCalibration.start();
-          pauseCounter = true;
+          holdCalibration.start(); // reset the timer everytime you fail the optimal distance check
+          pauseCounter = true; //set pause so it will activate during the game
         }
       }
     }
@@ -941,17 +951,17 @@ boolean calibrated(){
 }
 
 
-void displayText(String dialogue, int x, int y){ //ChatGPT inspired
+void displayText(String dialogue, int x, int y){ //Types out the text from the first word to the end
     if (index < dialogue.length()) {
     String partialMessage = dialogue.substring(0, index+1); // Incrementally increase the number of characters displayed
     text(partialMessage, x, y);
     index += speed;
-  } else if (index == dialogue.length() || index == dialogue.length() + 1) {
+  } else if (index == dialogue.length() || index == dialogue.length() + 1) { // When the conversation is over just print out the entire text
     text(dialogue, x, y);
   }
 }
 
-void kyaSound(){
+void kyaSound(){ // Randomize between a series of Kya Sounds
     switch(randomSound(kyas.length)){
       case 0:
       kya1.play();
@@ -974,7 +984,7 @@ void kyaSound(){
     }
 }
 
-void oofSound(){
+void oofSound(){ // Randomize between a series of Oof Sounds
     switch(randomSound(oofs.length)){
       case 0:
       oof1.play();
@@ -988,30 +998,30 @@ void oofSound(){
     }
 }
 
-void deathCheck(){
+void deathCheck(){ // Change state to death
     Lore = false;
     Game = false;
     Death = true;
 }
-void momHealthbar(){
+void momHealthbar(){ // Generate the mom health bar and broken heart counter
   fill(72, 64, 88);
   noStroke();
   rect((width / 2 - 250), 851, 42 + (47 *9), 79);
-  for (int x = 0; x < playerHealth; x++){
+  for (int x = 0; x < playerHealth; x++){ // mom health bar
     image(momHealth, (width / 2 - 250) + (47 * x), 856, 42, 74);     
   }
     image(momHealthBar, width / 2 - 270, 810, 497, 136);
-  for (int z = 0; z < brokenHearts; z++){
+  for (int z = 0; z < brokenHearts; z++){ // broken heart counter
     image(broken, (width / 2 - 250) + (z * 75.125), 950, 65.125, 65.125);
   }
 }
 
-int randomSound(int lengthArray){
+int randomSound(int lengthArray){ //randomize an array
   int random = int(random(0,lengthArray + 1));
   return random;
 }
 
-void cameraTrack(){
+void cameraTrack(){ // Camera track for the bottom right corner
   noFill();
   stroke(255);
   rect(width - 269, height - 269, 269, 269);
@@ -1019,12 +1029,12 @@ void cameraTrack(){
     image(jumpIcon, camX + (width - 269), camY + (height - 269));
 }
 
-void pauseCountdown(){
-  if (pauseCounter) {
+void pauseCountdown(){ // pause timer control
+  if (pauseCounter) { //initial timer
     pause.start();
     pauseCounter = false;
   }
-  if (!pause.isFinished()) {
+  if (!pause.isFinished()) { // countdown behaviours
       fill(0, 120);
       rect(0,0, width, height);
       fill(255, 255);
@@ -1041,12 +1051,12 @@ void pauseCountdown(){
   
 }
 
-void movieEvent(Movie m) {
+void movieEvent(Movie m) { // movie play event
   m.read();
 }
 
 
-void keyPressed(){
+void keyPressed(){ // Debugging tool to skip to final boss for testing
   if (key == 'm'){
     brokenHearts = 3;
     introSong.stop();
@@ -1056,3 +1066,6 @@ void keyPressed(){
     goodEnding = true;
   }
 }
+
+//Citations:
+// [1] David Han. Face Tracking with OpenCV (2023). Retrieved March 13th 2024 from https://learn.uwaterloo.ca/d2l/le/content/983488/viewContent/5369538/View
