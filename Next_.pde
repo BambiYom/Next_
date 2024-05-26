@@ -819,7 +819,12 @@ void deathScreen(){
   if (goodEnding){ // when you are defeated at the 3rd Suitor you go here
     if (Instr){
       bossTut();
-    } else {
+    } else if (Granny.giveHealth() == 0){
+      fill(0);
+      rect(0,0,1920,1080);
+      imageMode(CENTER);
+      image(gameOverTitle2,0,0);
+      } else {
       if (initialTimer){ // Starts the initial timers to begin the fight
         zoneDelay.start(); // Zone starting
         zone = Granny.chooseZone(); // Set the zone to a new zone
