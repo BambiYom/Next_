@@ -43,6 +43,7 @@ SoundFile kya5;
 SoundFile kya6;
 SoundFile [] kyas;
 SoundFile musicianBanger;
+SoundFile RichSong;
 
 //Camera Tracking Related
 int prevY = -1000;
@@ -96,6 +97,7 @@ PImage gameBG;
 PImage suitor1Defeat;
 PImage suitor2Defeat;
 PImage gameOverTitle;
+PImage gameOverTitle2;
 
 PImage heart;
 PImage broken;
@@ -106,6 +108,15 @@ boolean Start = false;
 boolean Lore = false;
 boolean Instruction = false;
 boolean Game = false;
+
+//Boss Instructions
+PImage Instr1;
+Gif Instr2;
+Gif Instr3;
+Gif Instr4;
+Gif Instr5;
+Gif Instr6;
+boolean insTimer = true;
 
 // Everything related to talking
 Dialogue lore;
@@ -160,6 +171,8 @@ Timer attack;
 bossFight Granny;
 Timer zoneDelay;
 boolean initialTimer = true;
+boolean Instr = true;
+int curInstr = 0;
 int zone = 0;
 Timer iFrames;
 PImage chargeLeft;
@@ -223,7 +236,8 @@ void setup() {
   kya6 = new SoundFile(this, "302-iza-kyaa-006.mp3");
   kyas = new SoundFile [] {kya1, kya2, kya3, kya4, kya5, kya6};
   romanticBanger = new SoundFile(this, "suitor3-v1.5.mp3");
-  musicianBanger = new SoundFile(this, "Suitor_1_Draft.mp3");
+  musicianBanger = new SoundFile(this, "melo.mp3");
+  RichSong = new SoundFile(this, "302_-_suitor_2_music_v1.mp3");
   
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
@@ -231,6 +245,12 @@ void setup() {
   Grandma = new Gif(this, "Grandma.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
   bigJump = new Gif(this, "Big Jump.gif");
+  Instr1 = loadImage("bossfight_guide1.png");
+  Instr2 = new Gif(this, "bossfight_guide2.gif");
+  Instr3 = new Gif(this, "bossfight_guide3.gif");
+  Instr4 = new Gif(this, "bossfight_guide4.gif");
+  Instr5 = new Gif(this, "bossfight_guide5.gif");
+  Instr6 = new Gif(this, "bossfight_guide6.gif");
   gameoverScene = new Movie(this, "TempGameOver.mp4");
   sadScene = new Movie(this, "Sad.mp4");
   Train = loadImage("train.png");
@@ -259,6 +279,7 @@ void setup() {
   suitor1Defeat = loadImage("suitor1Defeat.png");
   suitor2Defeat = loadImage("suitor2Defeat.png");
   gameOverTitle = loadImage("gameOver.png");
+  gameOverTitle2 = loadImage("gameOver_2.png");
   
   // Dialogue Initialization
   lore = new Dialogue();
@@ -317,6 +338,12 @@ void setup() {
   introSong.loop();
   Grandma.loop();
   bigJump.loop();
+  Instr2.loop();
+  Instr3.loop();
+  Instr4.loop();
+  Instr5.loop();
+  Instr6.loop();
+  
   //Set volumes
   Bedroom.amp(0.5);
   musicianBanger.amp(0.5);
@@ -541,7 +568,6 @@ void defeatScreen(){
     textSize(32);
     speed = 2;
     if (scene5Time) {
-      Bedroom.loop();
       autoScroll.start();
       scene5Time = false;
     }
@@ -553,6 +579,7 @@ void defeatScreen(){
       suitor2 = true;
       index = 0;
       musicianBanger.pause();
+      RichSong.loop();
       Defeat = false;
       Game = true;
       brokenHearts++;
@@ -790,40 +817,42 @@ void Suit3(){
 
 void deathScreen(){
   if (goodEnding){ // when you are defeated at the 3rd Suitor you go here
-    if (initialTimer){ // Starts the initial timers to begin the fight
-      zoneDelay.start(); // Zone starting
-      zone = Granny.chooseZone(); // Set the zone to a new zone
-      initialTimer = false;
-    }
-    fill(0);
-    rect(0,0,width,height); // Set the background to black
-    if (brokenHearts >= 0){ 
-      for (int z = 0; z < brokenHearts; z++){ // Display the current amount of broken hearts
-        image(broken, (width / 2 - 250) + (z * 75.125), 900, 65.125, 65.125);
+    if (Instr){
+      bossTut();
+    } else {
+      if (initialTimer){ // Starts the initial timers to begin the fight
+        zoneDelay.start(); // Zone starting
+        zone = Granny.chooseZone(); // Set the zone to a new zone
+        initialTimer = false;
       }
-    }
-    Granny.displayAttack(zone); //Show where the attack is happening at in the chosen zone
-    
-    if (zoneDelay.isFinished()){ // When Zone timer is finished
-      Granny.damaged(); // Granny takes damage
-      zoneDelay.start(); // We set a new zone Timer
-      zone = Granny.chooseZone(); // and we choose a new zone
-    }
-    Granny.displayCharacter(); // Show the character on the screen in the proper spot for more details refer to BossFight Class
-    Granny.displayGrandma(); // Display the face of Grandma for more details look at the BossFight Class
-    
-    if(Granny.detectCollision() && iFrames.isFinished()){ // if you get hit by granny and you don't have iFrames
-      heartShatter.play(); // play damage sound
-      if (brokenHearts != 0) {
-        brokenHearts--; //lose a heart
+      fill(0);
+      rect(0,0,width,height); // Set the background to black
+      if (brokenHearts >= 0){ 
+        for (int z = 0; z < brokenHearts; z++){ // Display the current amount of broken hearts
+          image(broken, (width / 2 - 250) + (z * 75.125), 900, 65.125, 65.125);
+        }
       }
-      iFrames.start(); // reset iFrames
+      Granny.displayAttack(zone); //Show where the attack is happening at in the chosen zone
       
-    } else if (!Granny.detectCollision()){ // incomplete code fragment
-      //good ending
+      if (zoneDelay.isFinished()){ // When Zone timer is finished
+        Granny.damaged(); // Granny takes damage
+        zoneDelay.start(); // We set a new zone Timer
+        zone = Granny.chooseZone(); // and we choose a new zone
+      }
+      Granny.displayCharacter(); // Show the character on the screen in the proper spot for more details refer to BossFight Class
+      Granny.displayGrandma(); // Display the face of Grandma for more details look at the BossFight Class
+      
+      if(Granny.detectCollision() && iFrames.isFinished()){ // if you get hit by granny and you don't have iFrames
+        heartShatter.play(); // play damage sound
+        if (brokenHearts != 0) {
+          brokenHearts--; //lose a heart
+        }
+        iFrames.start(); // reset iFrames
+        
+      }
+      fill(0,0,255);
+      rect(0, height - 100, 192 * Granny.giveHealth(), 100); // display the Grandma's health or Timer
     }
-    fill(0,0,255);
-    rect(0, height - 100, 192 * Granny.giveHealth(), 100); // display the Grandma's health or Timer
   } else {
       if (Scene1) {
       
@@ -1055,6 +1084,80 @@ void movieEvent(Movie m) { // movie play event
   m.read();
 }
 
+void bossTut(){
+  switch(curInstr){
+    case 0:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr1,0,0);
+    if (autoScroll.isFinished()){
+      curInstr++;
+      insTimer = true;
+    }
+    break;
+    
+    case 1:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr2,0,0);
+    if (autoScroll.isFinished()){
+      curInstr++;
+      insTimer = true;
+    }
+    break;
+    
+    case 2:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr3,0,0);
+    if (autoScroll.isFinished()){
+      curInstr++;
+      insTimer = true;
+    }
+    break;
+    
+    case 3:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr4,0,0, 1920, 1080);
+    if (autoScroll.isFinished()){
+      curInstr++;
+      insTimer = true;
+    }
+    break;    
+    
+    case 4:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr5,0,0, 1920,1080);
+    if (autoScroll.isFinished()){
+      curInstr++;
+      insTimer = true;
+    }
+    break;
+    
+    case 5:
+    if (insTimer){
+      autoScroll.start();
+      insTimer = false;
+    }
+    image(Instr6,0,0, 1920,1080);
+    if (autoScroll.isFinished()){
+      Instr = false;
+    }
+    break;
+  }
+}
 
 void keyPressed(){ // Debugging tool to skip to final boss for testing
   if (key == 'm'){
