@@ -278,8 +278,8 @@ void setup() {
   gameBG = loadImage("expbg.png");
   suitor1Defeat = loadImage("suitor1Defeat.png");
   suitor2Defeat = loadImage("suitor2Defeat.png");
-  gameOverTitle = loadImage("gameOver.png");
-  gameOverTitle2 = loadImage("gameOver_2.png");
+  gameOverTitle = loadImage("badending.png");
+  gameOverTitle2 = loadImage("goodending.png");
   
   // Dialogue Initialization
   lore = new Dialogue();
@@ -822,7 +822,7 @@ void deathScreen(){
     } else if (Granny.giveHealth() == 0){
       fill(0);
       rect(0,0,1920,1080);
-      imageMode(CENTER);
+      imageMode(CORNER);
       image(gameOverTitle2,0,0);
       } else {
       if (initialTimer){ // Starts the initial timers to begin the fight
@@ -875,8 +875,8 @@ void deathScreen(){
     if (Scene2) { 
       fill(0);
       rect(0,0, width, height); //Set a black screen
-      imageMode(CENTER);
-      image(gameOverTitle, width/2, height /2); // Gameover Title Card
+      imageMode(CORNER);
+      image(gameOverTitle, 0, 0); // Gameover Title Card
       imageMode(CORNER);
     }
   }
