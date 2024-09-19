@@ -57,4 +57,50 @@ class Dialogue{
       Bedroom.stop();
     }
   }
+    void exitDefeat(int curSuitor){ // curSuitor 1 == musician, curSuitor 2 == Rich
+    if (sceneTime) { // initialize timer
+      autoScroll.start();
+      sceneTime = false;
+    }
+    if (autoScroll.isFinished()){ // change scene
+      switch(curSuitor){
+        case 1:
+          MusicianDialogue = false;
+          suitor1 = false;
+          suitor2 = true;
+          musicianBanger.pause();
+          RichSong.loop();
+          index = 0;
+          Defeat = false;
+          Game = true;
+          brokenHearts++;
+          curScene = 1;
+          break;
+        case 2:
+          RichDialogue = false;
+          suitor2 = false;
+          suitor3 = true;
+          RichSong.pause();
+          romanticBanger.loop();
+          index = 0;
+          Defeat = false;
+          Game = true;
+          brokenHearts++;
+          curScene = 1;
+          break;
+        case 3:
+          RomanticDialogue = false;
+          suitor3 = false;
+          romanticBanger.pause();
+          finalBattle.loop();
+          Defeat = false;
+          Death = true;
+          goodEnding = true;
+          curScene = 1;
+          break;
+          
+      }
+      
+    }
+  }
 }

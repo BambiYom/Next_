@@ -44,6 +44,7 @@ SoundFile kya6;
 SoundFile [] kyas;
 SoundFile musicianBanger;
 SoundFile RichSong;
+SoundFile finalBattle;
 
 //Camera Tracking Related
 int prevY = -1000;
@@ -238,6 +239,7 @@ void setup() {
   romanticBanger = new SoundFile(this, "suitor3-v1.5.mp3");
   musicianBanger = new SoundFile(this, "melo.mp3");
   RichSong = new SoundFile(this, "302_-_suitor_2_music_v1.mp3");
+  finalBattle = new SoundFile(this, "302 - boss battle music draft v1 (mastered).mp3");
 
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
@@ -562,37 +564,15 @@ void defeatScreen() {
   /* Whenever a suitor is defeated this dialogue is played
    Structure is similar to Lore Dialogue Class*/
   if (MusicianDialogue) {
-    image(suitor1Defeat, 0, 0);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(229, 204, 85);
-    stroke(0);
-    rect(50, 700, 245, 270);
-    image(Suitor1, 50, 700, 245, 270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("Musician", 95, 1045);
-    textSize(32);
-    speed = 2;
-    if (scene5Time) {
-      autoScroll.start();
-      scene5Time = false;
+      switch (defeat.curScene){
+        case 1:
+        defeat.displayScene(Talking, "Hello, beautiful... /nWould you like to be my muse for my next album?",
+        "Musician", suitor1Defeat);
+        defeat.moveScene(2);
+        break;
+        case 2:
+      }
     }
-    displayText("Hello, beautiful... /nWould you like to be my muse for my next album?", 600, 900);
-    image(jumpIcon, 1800, 1000);
-    if (autoScroll.isFinished()) { // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
-      MusicianDialogue = false;
-      suitor1 = false;
-      suitor2 = true;
-      index = 0;
-      musicianBanger.pause();
-      RichSong.loop();
-      Defeat = false;
-      Game = true;
-      brokenHearts++;
-    }
-  }
   if (RichDialogue) {
     image(suitor2Defeat, 0, 0);
     fill(0);
