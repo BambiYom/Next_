@@ -134,7 +134,7 @@ int charTalking = 0;
 boolean scene4Time = true;
 boolean MusicianDialogue = false;
 boolean RichDialogue = false;
-boolean RomanticDialogue;
+boolean RomanticDialogue = false;
 boolean scene5Time = true;
 boolean scene6Time = true;
 boolean goodEnding = false;
@@ -566,47 +566,123 @@ void defeatScreen() {
   if (MusicianDialogue) {
       switch (defeat.curScene){
         case 1:
-        defeat.displayScene(Talking, "Hello, beautiful... /nWould you like to be my muse for my next album?",
-        "Musician", suitor1Defeat);
+        defeat.displayScene(Talking, "Hello, beautiful... \nWould you like to be my muse for my next album?",
+        "CHANG YING", suitor1Defeat);
         defeat.moveScene(2);
         break;
         case 2:
+        defeat.displayScene(Talking, "Thanks, but I'm not interested.", "MOM", suitor1Defeat);
+        defeat.moveScene(3);
+        break;
+        case 3:
+        defeat.displayScene(Talking, "*dejected* Could you at least buy my latest single?", "CHANG YING", suitor1Defeat);
+        defeat.moveScene(4);
+        break;
+        case 4:
+        defeat.displayScene(Talking, "No thanks.", "MOM", suitor1Defeat);
+        defeat.exitDefeat(1);
+        break;
       }
     }
   if (RichDialogue) {
-    image(suitor2Defeat, 0, 0);
-    fill(0);
-    rect(0, 800, 1920, 300);
-    fill(144, 203, 208);
-    stroke(0);
-    rect(50, 700, 245, 270);
-    image(Suitor2, 50, 700, 245, 270);
-    stroke(255);
-    fill(255);
-    textSize(64);
-    text("Rich Boy", 95, 1045);
-    textSize(32);
-    displayText("I guess money can't buy everything ...", 600, 900);
-    if (scene6Time) {
-      autoScroll.start();
-      scene6Time = false;
-    }
-
-    image(jumpIcon, 1800, 1000);
-    if (scene4Time) {
-      autoScroll.start();
-      scene4Time = false;
-    }
-    if (autoScroll.isFinished()) { // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
-      index = 0;
-      RichDialogue = false;
-      romanticBanger.loop();
-      Defeat = false;
-      Game = true;
-      brokenHearts++;
-      suitor2 = false;
-      suitor3 = true;
-    }
+      switch (defeat.curScene){
+        case 1:
+        defeat.displayScene(Talking, "A high-achieving woman like yourself \ndeserves a high-value man like me, no?",
+        "SHOU SHAN", suitor2Defeat);
+        defeat.moveScene(2);
+        break;
+        case 2:
+        defeat.displayScene(Talking, "I could buy anything you could ever want.", "SHOU SHAN", suitor2Defeat);
+        defeat.moveScene(3);
+        break;
+        case 3:
+        defeat.displayScene(Talking, "*hesitant* I... I don't need anything from you.", "MOM", suitor2Defeat);
+        defeat.moveScene(4);
+        break;
+        case 4:
+        defeat.displayScene(Talking, "I guess money can't buy everything...", "SHOU SHAN", suitor2Defeat);
+        defeat.exitDefeat(2);
+        break;
+      }
+  if (RomanticDialogue) {
+        switch (defeat.curScene){
+        case 1:
+        defeat.displayScene(Talking, "The way the light catches your face... it's like a painting.",
+        "QING LING", suitor2Defeat);
+        defeat.moveScene(2);
+        break;
+        case 2:
+        defeat.displayScene(Talking, "Oh, stop it.", "MOM", suitor2Defeat);
+        defeat.moveScene(3);
+        break;
+        case 3:
+        defeat.displayScene(Talking, "Ya Cheng, I've been wanting to tell you this for a while.", "QING LING", suitor2Defeat);
+        defeat.moveScene(4);
+        break;
+        case 4:
+        defeat.displayScene(Talking, "I... I think I'm falling for you", "QING LING", suitor2Defeat);
+        defeat.moveScene(5);
+        break;
+        case 5:
+        defeat.displayScene(Talking, "I... I don't know what to say.", "MOM", suitor2Defeat);
+        defeat.moveScene(6);
+        break;
+        case 6:
+        defeat.displayScene(Talking, "You don't have to say anything.", "QING LING", suitor2Defeat);
+        defeat.moveScene(7);
+        break;
+        case 7:
+        defeat.displayScene(Talking, "Just know that I care about you deeply.", "QING LING", suitor2Defeat);
+        defeat.moveScene(8);
+        break;
+        case 8:
+        defeat.displayScene(Talking, "I... I care about you too.", "MOM", suitor2Defeat);
+        defeat.moveScene(9);
+        break;
+        case 9:
+        defeat.displayScene(Talking, "But...", "MOM", suitor2Defeat);
+        defeat.moveScene(10);
+        break;
+        case 10:
+        defeat.displayScene(Talking, "What...the? What is this?", "GRANDMA", suitor2Defeat);
+        defeat.moveScene(11);
+        break;
+        case 11:
+        defeat.displayScene(Talking, "Mom, we...", "MOM", suitor2Defeat);
+        defeat.moveScene(12);
+        break;
+        case 12:
+        defeat.displayScene(Talking, "I can't believe this!", "GRANDMA", suitor2Defeat);
+        defeat.moveScene(13);
+        break;
+        case 13:
+        defeat.displayScene(Talking, "I know, mother. I tried...", "MOM", suitor2Defeat);
+        defeat.moveScene(14);
+        break;
+        case 14:
+        defeat.displayScene(Talking, "Tried? That's not good enough!", "GRANDMA", suitor2Defeat);
+        defeat.moveScene(15);
+        break;
+        case 15:
+        defeat.displayScene(Talking, "We need to talk now!", "GRANDMA", suitor2Defeat);
+        defeat.exitDefeat(3);
+        break;
+      }
+    //image(jumpIcon, 1800, 1000);
+    //if (scene4Time) {
+    //  autoScroll.start();
+    //  scene4Time = false;
+    //}
+    //if (autoScroll.isFinished()) { // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
+    //  index = 0;
+    //  RichDialogue = false;
+    //  romanticBanger.loop();
+    //  Defeat = false;
+    //  Game = true;
+    //  brokenHearts++;
+    //  suitor2 = false;
+    //  suitor3 = true;
+    //}
   }
 }
 
@@ -1160,6 +1236,9 @@ void keyPressed() { // Debugging tool to skip to final boss for testing
   if (key == 's') {
     Start = false;
     Lore = true;
+  }
+  if (key == 'a') {
+    attacked();
   }
 }
 
