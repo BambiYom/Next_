@@ -28,12 +28,9 @@ void new_Boss(){
     }
   }
   if (hp == 0){
-    image(winScreen, 0,0);
-    winSound.play();
     bossBattleBGM.stop();
-    timeTicking.stop();
-    grandmaHurt.pause();
-    noLoop();
+    Death = false;
+    Defeat = true;
   }
   if (curRope <= 0){
     image(loseScreen, 0,0);

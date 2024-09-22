@@ -122,6 +122,7 @@ boolean insTimer = true;
 // Everything related to talking
 Dialogue lore;
 Dialogue defeat;
+Dialogue grandma;
 
 boolean Scene1 = true;
 boolean scene1Time = true;
@@ -198,6 +199,7 @@ boolean showGrandmaDamaged = false;
 int hurtGrandmaDisplayTime = 1000; // milliseconds
 int startTime = 0;
 boolean oneTime = true;
+boolean grandmaDialogue = true;
 int card = 0;
 
 PFont Deltarune; // font from deltarune
@@ -292,7 +294,7 @@ void setup() {
   // Dialogue Initialization
   lore = new Dialogue();
   defeat = new Dialogue();
-
+  grandma = new Dialgoue();
   //Timer Initalization
   autoScroll = new Timer(5000);
   pause = new Timer(3125);
@@ -682,21 +684,11 @@ void defeatScreen() {
         defeat.exitDefeat(3);
         break;
       }
-    //image(jumpIcon, 1800, 1000);
-    //if (scene4Time) {
-    //  autoScroll.start();
-    //  scene4Time = false;
-    //}
-    //if (autoScroll.isFinished()) { // Key Difference from Lore is that you will return to the game and your brokenHeart count increments
-    //  index = 0;
-    //  RichDialogue = false;
-    //  romanticBanger.loop();
-    //  Defeat = false;
-    //  Game = true;
-    //  brokenHearts++;
-    //  suitor2 = false;
-    //  suitor3 = true;
-    //}
+    if (grandmaDialogue){
+      switch(grandma.curScene){
+        case 1:
+      }
+    }
   }
 }
 

@@ -98,7 +98,12 @@ class Dialogue{
           goodEnding = true;
           curScene = 1;
           break;
-          
+        case 4:
+          image(winScreen, 0,0);
+          winSound.play();
+          timeTicking.stop();
+          grandmaHurt.pause();
+          noLoop();
       }
       
     }
