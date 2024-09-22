@@ -294,7 +294,7 @@ void setup() {
   // Dialogue Initialization
   lore = new Dialogue();
   defeat = new Dialogue();
-  grandma = new Dialgoue();
+  grandma = new Dialogue();
   //Timer Initalization
   autoScroll = new Timer(5000);
   pause = new Timer(3125);
@@ -431,18 +431,18 @@ void loreScreens() { // State where all of the initial Dialogue happens
      For more information check the Dialogue Class File*/
   case 1:
     lore.sound(Dialogue1);
-    lore.displayScene(Talking, "Phew, finally back in my dorm room.", "MOM", Location);
+    lore.displayScene(Talking, "Phew, finally back in my dorm room.", "YA CHENG", Location);
     lore.moveScene(2);
     break;
   case 2:
     lore.sound(Dialogue3);
-    lore.displayScene(Talking, "Hmm... a package for me?", "MOM", Box);
+    lore.displayScene(Talking, "Hmm... a package for me?", "YA CHENG", Box);
     lore.moveScene(3);
     break;
   case 3:
     lore.sound(boxOpen);
     lore.sound(Dialogue2);
-    lore.displayScene(Talking, "A letter from Mother... 'Don't fall in love', huh...", "MOM", openBox);
+    lore.displayScene(Talking, "A letter from Mother... 'Don't fall in love', huh...", "YA CHENG", openBox);
     lore.moveScene(4);
     break;
   case 4:
@@ -451,42 +451,42 @@ void loreScreens() { // State where all of the initial Dialogue happens
     break;
   case 5:
     lore.sound(Dialogue2);
-    lore.displayScene(Talking, "*sigh* Ever since I was young,\nI always had to maintain my family's honour.", "MOM", sadScene);
+    lore.displayScene(Talking, "*sigh* Ever since I was young,\nI always had to maintain my family's honour.", "YA CHENG", sadScene);
     lore.moveScene(6);
     break;
   case 6:
     lore.sound(Dialogue2);
-    lore.displayScene(Talking, "I thought I'd be trapped under their roof forever,\nbut one day I got admitted to a university far away...", "MOM", sadScene);
+    lore.displayScene(Talking, "I thought I'd be trapped under their roof forever,\nbut one day I got admitted to a university far away...", "YA CHENG", sadScene);
     lore.moveScene(7);
     break;
   case 7:
     lore.sound(Dialogue4);
-    lore.displayScene(Grandma, "I just wanted to say one thing to you before you leave...", "GRANDMA", Train);
+    lore.displayScene(Grandma, "I just wanted to say one thing to you before you leave...", "MOM", Train);
     lore.moveScene(8);
     break;
   case 8:
     lore.sound(Dialogue4);
-    lore.displayScene(Grandma, "Just because I'm not there...", "GRANDMA", Train);
+    lore.displayScene(Grandma, "Just because I'm not there...", "MOM", Train);
     lore.moveScene(9);
     break;
   case 9:
     lore.sound(Dialogue4);
-    lore.displayScene(Grandma, "Does not mean you can fall in love.", "GRANDMA", Train);
+    lore.displayScene(Grandma, "Does not mean you can fall in love.", "MOM", Train);
     lore.moveScene(10);
     break;
   case 10:
     lore.sound(Dialogue4);
-    lore.displayScene(Grandma, "And remember...", "GRANDMA", Train);
+    lore.displayScene(Grandma, "And remember...", "MOM", Train);
     lore.moveScene(11);
     break;
   case 11:
     lore.sound(Dialogue4);
-    lore.displayScene(Grandma, "I'm coming to visit you after your classes end.", "GRANDMA", Train);
+    lore.displayScene(Grandma, "I'm coming to visit you after your classes end.", "MOM", Train);
     lore.moveScene(12);
     break;
   case 12:
     lore.sound(Dialogue3);
-    lore.displayScene(Talking, "Yes, Mother...", "MOM", Train);
+    lore.displayScene(Talking, "Yes, Mother...", "YA CHENG", Train);
     lore.exitLore();
     break;
   }
@@ -586,7 +586,7 @@ void defeatScreen() {
         defeat.moveScene(2);
         break;
         case 2:
-        defeat.displayScene(Talking, "Thanks, but I'm not interested.", "MOM", suitor1Defeat);
+        defeat.displayScene(Talking, "Thanks, but I'm not interested.", "YA CHENG", suitor1Defeat);
         defeat.moveScene(3);
         break;
         case 3:
@@ -594,7 +594,7 @@ void defeatScreen() {
         defeat.moveScene(4);
         break;
         case 4:
-        defeat.displayScene(Talking, "No thanks.", "MOM", suitor1Defeat);
+        defeat.displayScene(Talking, "No thanks.", "YA CHENG", suitor1Defeat);
         defeat.exitDefeat(1);
         break;
       }
@@ -611,7 +611,7 @@ void defeatScreen() {
         defeat.moveScene(3);
         break;
         case 3:
-        defeat.displayScene(Talking, "*hesitant* I... I don't need anything from you.", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "*hesitant* I... I don't need anything from you.", "YA CHENG", suitor2Defeat);
         defeat.moveScene(4);
         break;
         case 4:
@@ -628,7 +628,7 @@ void defeatScreen() {
         defeat.moveScene(2);
         break;
         case 2:
-        defeat.displayScene(Talking, "Oh, stop it.", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "Oh, stop it.", "YA CHENG", suitor2Defeat);
         defeat.moveScene(3);
         break;
         case 3:
@@ -640,7 +640,7 @@ void defeatScreen() {
         defeat.moveScene(5);
         break;
         case 5:
-        defeat.displayScene(Talking, "I... I don't know what to say.", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "I... I don't know what to say.", "YA CHENG", suitor2Defeat);
         defeat.moveScene(6);
         break;
         case 6:
@@ -652,41 +652,93 @@ void defeatScreen() {
         defeat.moveScene(8);
         break;
         case 8:
-        defeat.displayScene(Talking, "I... I care about you too.", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "I... I care about you too.", "YA CHENG", suitor2Defeat);
         defeat.moveScene(9);
         break;
         case 9:
-        defeat.displayScene(Talking, "But...", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "But...", "YA CHENG", suitor2Defeat);
         defeat.moveScene(10);
         break;
         case 10:
-        defeat.displayScene(Talking, "What...the? What is this?", "GRANDMA", suitor2Defeat);
+        defeat.displayScene(Talking, "What...the? What is this?", "MOM", suitor2Defeat);
         defeat.moveScene(11);
         break;
         case 11:
-        defeat.displayScene(Talking, "Mom, we...", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "Mom, we...", "YA CHENG", suitor2Defeat);
         defeat.moveScene(12);
         break;
         case 12:
-        defeat.displayScene(Talking, "I can't believe this!", "GRANDMA", suitor2Defeat);
+        defeat.displayScene(Talking, "I can't believe this!", "MOM", suitor2Defeat);
         defeat.moveScene(13);
         break;
         case 13:
-        defeat.displayScene(Talking, "I know, mother. I tried...", "MOM", suitor2Defeat);
+        defeat.displayScene(Talking, "I know, mother. I tried...", "YA CHENG", suitor2Defeat);
         defeat.moveScene(14);
         break;
         case 14:
-        defeat.displayScene(Talking, "Tried? That's not good enough!", "GRANDMA", suitor2Defeat);
+        defeat.displayScene(Talking, "Tried? That's not good enough!", "MOM", suitor2Defeat);
         defeat.moveScene(15);
         break;
         case 15:
-        defeat.displayScene(Talking, "We need to talk now!", "GRANDMA", suitor2Defeat);
+        defeat.displayScene(Talking, "We need to talk now!", "MOM", suitor2Defeat);
         defeat.exitDefeat(3);
         break;
       }
     if (grandmaDialogue){
       switch(grandma.curScene){
         case 1:
+        defeat.displayScene(Talking, "Is this... really what you desire, my child?",
+        "MOM", suitor1Defeat);
+        defeat.moveScene(2);
+        break;
+        case 2:
+        defeat.displayScene(Talking, "Yes, mother. I truly love him.", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(3);
+        break;
+        case 3:
+        defeat.displayScene(Talking, "...", "MOM", suitor1Defeat);
+        defeat.moveScene(4);
+        break;
+        case 4:
+        defeat.displayScene(Talking, "I know that you're only against this \nbecause you love me and want the best for me.", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(5);
+        break;
+        case 5:
+        defeat.displayScene(Talking, "I know that, and I'm very thankful.", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(6);
+        break;
+        case 6:
+        defeat.displayScene(Talking, "So please, just once, \ntrust me to make this choice for myself.", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(7);
+        break;
+        case 7:
+        defeat.displayScene(Talking, "...", "MOM", suitor1Defeat);
+        defeat.moveScene(8);
+        break;
+        case 8:
+        defeat.displayScene(Talking, "Okay.", "MOM", suitor1Defeat);
+        defeat.moveScene(9);
+        break;
+        case 9:
+        defeat.displayScene(Talking, "?!", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(6);
+        break;
+        case 10:
+        defeat.displayScene(Talking, "Go. Be with him. Before I change my mind.", "MOM", suitor1Defeat);
+        defeat.moveScene(7);
+        break;
+        case 11:
+        defeat.displayScene(Talking, "Mother, I… Thank you so much-", "YA CHENG", suitor1Defeat);
+        defeat.moveScene(8);
+        break;
+        case 12:
+        defeat.displayScene(Talking, "You. \nTake care of my foolish daughter for me.", "MOM", suitor1Defeat);
+        defeat.moveScene(9);
+        break;
+        case 13:
+        defeat.displayScene(Talking, "I will do my best, ma'am.", "QING LING", suitor1Defeat);
+        defeat.exitDefeat(4);
+        break;
       }
     }
   }
