@@ -30,6 +30,7 @@ void new_Boss(){
   if (hp == 0){
     image(winScreen, 0,0);
     winSound.play();
+    bossBattleBGM.stop();
     timeTicking.stop();
     grandmaHurt.pause();
     noLoop();
@@ -37,12 +38,13 @@ void new_Boss(){
   if (curRope <= 0){
     image(loseScreen, 0,0);
     loseSound.play();
+    bossBattleBGM.stop();
     timeTicking.stop();
     wrongAction.pause();
     noLoop();
   }
-  if (timer % 120 == 0) { // Every 2 seconds the rope shortens
-      curRope--;
+  if (timer % 5 == 0) { // Every 2 seconds the rope shortens
+      curRope -= 2;
   }
 }
 
@@ -57,6 +59,7 @@ void showcase() {
     text("boy! Break it off!", 1220, 298 + 92);
     fill(255);
     text("No, I won't. I love him.", 670, 880);
+    cardCheck();
     break;
   case 1:
     image(blueCard, 600, 675);
@@ -73,6 +76,7 @@ void showcase() {
 //      curRope = maxRope;
 //      oneTime = false;
 //    }
+    cardCheck();
     break;
   case 2:
     card = 1;
@@ -90,6 +94,7 @@ void showcase() {
     fill(255);
     text("You're right, academics", 690, 880);
     text("are more important.", 690, 880 + 46);
+    cardCheck();
     break;
   case 3:
     image(redCard, 600, 675);
@@ -107,6 +112,7 @@ void showcase() {
     text("You raised me to ", 675, 880);
     text("prioritize family honour", 675, 880 + 46);
     text("over my own desires.", 675, 880 + 92);
+    cardCheck();
     break;
   case 4:
     image(blueCard, 600, 675);
@@ -124,6 +130,7 @@ void showcase() {
     text("Family is more", 675, 880);
     text("important. What I want", 675, 880 + 46);
     text("doesn't matter.", 675, 880 + 92);
+    cardCheck();
     break;
   case 5:
     image(redCard, 600, 675);
@@ -140,6 +147,7 @@ void showcase() {
 //      curRope = maxRope;
 //      oneTime = false;
 //    }
+    cardCheck();
     break;
   case 6:
     image(redCard, 600, 675);
@@ -157,6 +165,7 @@ void showcase() {
 //      curRope = maxRope;
 //      oneTime = false;
 //    }
+    cardCheck();
     break;
   case 7:
     image(blueCard, 600, 675);
@@ -171,7 +180,7 @@ void showcase() {
     text("different.", 1220, 297 +92);
     fill(255);
     text("You're right. ", 675, 880);
-
+    cardCheck();
     break;
   case 8:
     image(redCard, 600, 675);
@@ -191,6 +200,7 @@ void showcase() {
     text("out together. It doesn't ", 675, 834 + 46);
     text("all have to be", 675, 834 + 92);
     text("perfect from the start.", 675, 834 + 138);
+    cardCheck();
     break;
   case 9:
     image(redCard, 600, 675);
@@ -209,6 +219,7 @@ void showcase() {
     text("Please, for once,", 675, 834 + 46);
     text("support me in making", 675, 834 + 92);
     text("my own decisions.", 675, 834 + 138);
+    cardCheck();
     break;
     case 10:
     image(redCard, 600, 675);
@@ -223,6 +234,7 @@ void showcase() {
     text("I'm sorry, Grandma,", 675, 834);
     text("but I have to", 675, 834 + 46);
     text("follow my heart.", 675, 834 + 92);
+    cardCheck();
     break;
   }
 }
@@ -253,10 +265,38 @@ void cardCheck(){ // 0 is red card and 1 is blue card
         grandmaHurt.play();
         showGrandmaDamaged = true; // Grandma got damaged
         startTime = millis();
+        curRope = maxRope;
         curCase++;
-      } //else if (
+      } else if (curRope == 0){
+          curRope = curRope - 5;
+          curCase++;
+          maxRope -= 4;
+          if (maxRope > 0){
+            curRope = maxRope;
+          } else if (maxRope < 0) {
+            curRope = 0;
+          }
+          wrongAction.play();
+      }
       break;
     case 1:
+      if (Jump()){
+          curCase++;
+          maxRope -= 4;
+          if (maxRope > 0){
+            curRope = maxRope;
+          } else if (maxRope < 0) {
+            curRope = 0;
+          }
+          wrongAction.play();
+      } else if (curRope == 0){
+          hp--;
+          grandmaHurt.play();
+          showGrandmaDamaged = true; // Grandma got damaged
+          startTime = millis();
+          curRope = maxRope;
+          curCase++;
+      }
       break;
   }
 }

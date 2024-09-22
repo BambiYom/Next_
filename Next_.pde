@@ -189,7 +189,6 @@ SoundFile winSound;
 SoundFile loseSound;
 SoundFile bossBattleBGM;
 Gif ropeBurn;
-PFont gameFont;
 int curCase = 0;
 int curRope = 38;
 int maxRope = 38;
@@ -197,9 +196,9 @@ int hp = 10;
 int timer = 0;
 boolean showGrandmaDamaged = false;
 int hurtGrandmaDisplayTime = 1000; // milliseconds
-int startTime;
+int startTime = 0;
 boolean oneTime = true;
-int card;
+int card = 0;
 
 PFont Deltarune; // font from deltarune
 
@@ -302,11 +301,11 @@ void setup() {
 
   //Boss initalization
   timeTicking = new SoundFile(this, "302-BOMB FUSE.mp3");
-  grandmaHurt = new SoundFile(this, "302-GRANDMA AIYA.mp3");
-  wrongAction = new SoundFile(this, "302-FAIL.mp3");
-  winSound = new SoundFile(this, "302-VICTORY.mp3");
-  loseSound = new SoundFile(this, "302-DEFEAT.mp3");
-//  bossBattleBGM; new SoundFile(this, "");
+  grandmaHurt = new SoundFile(this, "302-GRANDMA aiya (higher).mp3");
+  wrongAction = new SoundFile(this, "302-FAIL (higher).mp3");
+  winSound = new SoundFile(this, "302-victory (melody).mp3");
+  loseSound = new SoundFile(this, "302-defeat v1.mp3");
+  bossBattleBGM = new SoundFile(this, "302 - boss battle music draft v1 (mastered).mp3");
   bg = loadImage("bossbg.png");
   redCard = loadImage("o_card.png");
   blueCard = loadImage("x_card.png");
@@ -322,9 +321,6 @@ void setup() {
   health = loadImage("greendot.png");
   bossHealthBar = loadImage("bosshealthbar.png");
   ropeBurn = new Gif(this, "rope_burnt.gif");
-  //Setting the game Font
-  gameFont = createFont("undertale-deltarune-text-font-extended.ttf", 36);
-  textFont(gameFont);
   // repeat for other images
   ropeBurn.loop();
   // time ticking loop
@@ -1133,10 +1129,10 @@ void bossTut() {
 
 void keyPressed() { // Debugging tool to skip to final boss for testing
   if (key == 'm') {
-    brokenHearts = 3;
+    textSize(32);
     introSong.stop();
-    romanticBanger.play();
-    Calibrate = false;
+    bossBattleBGM.loop();
+    Start = false;
     Death = true;
     goodEnding = true;
   }

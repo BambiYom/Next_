@@ -92,7 +92,7 @@ class Dialogue{
           RomanticDialogue = false;
           suitor3 = false;
           romanticBanger.pause();
-          finalBattle.loop();
+          bossBattleBGM.loop();
           Defeat = false;
           Death = true;
           goodEnding = true;
