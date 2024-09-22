@@ -31,6 +31,7 @@ void new_Boss(){
     bossBattleBGM.stop();
     timeTicking.stop();
     Death = false;
+    grandmaDialogue = true;
     Defeat = true;
   }
   if (curRope <= 0){
