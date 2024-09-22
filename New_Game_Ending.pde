@@ -29,6 +29,7 @@ void new_Boss(){
   }
   if (hp == 0){
     bossBattleBGM.stop();
+    timeTicking.stop();
     Death = false;
     Defeat = true;
   }
