@@ -1187,6 +1187,10 @@ void keyPressed() { // Debugging tool to skip to final boss for testing
   if (key == 'a') {
     attacked();
   }
+  if (key == 'j'){
+    Jump();
+    Game = true;
+  }
 }
 
 //Citations:
