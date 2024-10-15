@@ -80,7 +80,6 @@ class Dialogue{
           RichDialogue = false;
           suitor2 = false;
           suitor3 = true;
-          RichSong.pause();
           romanticBanger.loop();
           index = 0;
           Defeat = false;
@@ -92,13 +91,22 @@ class Dialogue{
           RomanticDialogue = false;
           suitor3 = false;
           romanticBanger.pause();
-          bossBattleBGM.loop();
+          index = 0;
           Defeat = false;
+          bossIns = true;
+          break;
+        case 4:
+          bossBattleBGM.loop();
+          index = 0;
+          // time ticking loop
+          timeTicking.loop();
+          bossIns = false;
+          textSize(32);
           Death = true;
           goodEnding = true;
           curScene = 1;
           break;
-        case 4:
+        case 5:
           image(winScreen, 0,0);
           winSound.play();
           timeTicking.stop();

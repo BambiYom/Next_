@@ -25,6 +25,10 @@ SoundFile Calibration;
 SoundFile Bedroom;
 SoundFile romanticBanger;
 SoundFile Jump;
+SoundFile Dialogue1;
+SoundFile Dialogue2;
+SoundFile Dialogue3;
+SoundFile Dialogue4;
 SoundFile heartShatter;
 SoundFile boxOpen;
 SoundFile oof1;
@@ -42,54 +46,6 @@ SoundFile musicianBanger;
 SoundFile RichSong;
 SoundFile finalBattle;
 
-// Dialogue Sounds
-SoundFile Dialogue1;
-SoundFile Dialogue2;
-SoundFile Dialogue3;
-SoundFile Dialogue4;
-SoundFile Dialogue5;
-SoundFile Dialogue6;
-SoundFile Dialogue7;
-SoundFile Dialogue8;
-SoundFile Dialogue9;
-SoundFile Dialogue10;
-SoundFile Dialogue11;
-SoundFile Dialogue12;
-SoundFile Dialogue13;
-SoundFile Dialogue14;
-SoundFile Dialogue15;
-SoundFile Dialogue16;
-SoundFile Dialogue17;
-SoundFile Dialogue18;
-SoundFile Dialogue19;
-SoundFile Dialogue20;
-SoundFile Dialogue21;
-SoundFile Dialogue22;
-SoundFile Dialogue23;
-SoundFile Dialogue24;
-SoundFile Dialogue25;
-SoundFile Dialogue26;
-SoundFile Dialogue27;
-SoundFile Dialogue28;
-SoundFile Dialogue29;
-SoundFile Dialogue30;
-SoundFile Dialogue31;
-SoundFile Dialogue32;
-SoundFile Dialogue33;
-SoundFile Dialogue34;
-SoundFile Dialogue35;
-SoundFile Dialogue36;
-SoundFile Dialogue37;
-SoundFile Dialogue38;
-SoundFile Dialogue39;
-SoundFile Dialogue40;
-SoundFile Dialogue41;
-SoundFile Dialogue42;
-SoundFile Dialogue43;
-SoundFile Dialogue44;
-SoundFile Dialogue45;
-SoundFile Dialogue46;
-SoundFile Dialogue47;
 //Camera Tracking Related
 int prevY = -1000;
 int prevX;
@@ -110,9 +66,6 @@ int brokenHearts = 0;
 //Gifs and Animations
 Gif Opening;
 Gif Talking;
-Gif musTalk;
-Gif richTalk;
-Gif romTalk;
 Gif Grandma;
 Gif jumpIcon;
 Gif bigJump;
@@ -142,9 +95,6 @@ PImage chargeBar;
 PImage Bolt;
 PImage fist;
 PImage gameBG;
-PImage angyBG;
-PImage stareBG;
-PImage hugBG;
 PImage suitor1Defeat;
 PImage suitor2Defeat;
 PImage gameOverTitle;
@@ -162,17 +112,16 @@ boolean Game = false;
 
 //Boss Instructions
 PImage Instr1;
-PImage Instr2;
-PImage Instr3;
-PImage Instr4;
-PImage Instr5;
-PImage Instr6;
-boolean bossIns = false;
+Gif Instr2;
+Gif Instr3;
+Gif Instr4;
+Gif Instr5;
+Gif Instr6;
+boolean insTimer = true;
 
 // Everything related to talking
 Dialogue lore;
 Dialogue defeat;
-Dialogue bossTUT;
 Dialogue grandma;
 
 boolean Scene1 = true;
@@ -187,7 +136,6 @@ boolean scene4Time = true;
 boolean MusicianDialogue = false;
 boolean RichDialogue = false;
 boolean RomanticDialogue = false;
-boolean grandmaDialogue = false;
 boolean scene5Time = true;
 boolean scene6Time = true;
 boolean goodEnding = false;
@@ -248,9 +196,10 @@ int maxRope = 38;
 int hp = 10;
 int timer = 0;
 boolean showGrandmaDamaged = false;
-boolean bossT = false;
 int hurtGrandmaDisplayTime = 1000; // milliseconds
 int startTime = 0;
+boolean oneTime = true;
+boolean grandmaDialogue = true;
 int card = 0;
 
 PFont Deltarune; // font from deltarune
@@ -278,6 +227,10 @@ void setup() {
   Calibration = new SoundFile(this, "302-CALIBRATION DONE.wav");
   Bedroom = new SoundFile(this, "bedroom-music-v2.mp3");
   Jump = new SoundFile(this, "302-JUMP E.mp3");
+  Dialogue1 = new SoundFile(this, "mom-dialogue1.mp3");
+  Dialogue2 = new SoundFile(this, "mom-dialogue2.mp3");
+  Dialogue3 = new SoundFile(this, "mom-dialogue3.mp3");
+  Dialogue4 = new SoundFile(this, "grandma-dialogue1.mp3");
   heartShatter = new SoundFile(this, "302-HEART SHATTER.mp3");
   boxOpen = new SoundFile(this, "box_open.wav");
   oof1 = new SoundFile(this, "302-oof-001.mp3");
@@ -299,18 +252,15 @@ void setup() {
   // ALL Image Initialization
   Opening = new Gif(this, "Title.gif");
   Talking = new Gif(this, "FinalHead.gif");
-  musTalk = new Gif(this, "Mus.gif");
-  richTalk = new Gif(this, "RichTalk.gif");
-  romTalk = new Gif(this, "Romancetalking.gif");
   Grandma = new Gif(this, "Grandma.gif");
   jumpIcon = new Gif(this, "jumpIcon.gif");
   bigJump = new Gif(this, "Big Jump.gif");
   Instr1 = loadImage("bossfight_guide1.png");
-  Instr2 = loadImage("bossfight_guide2.png");
-  Instr3 = loadImage("bossfight_guide3.png");
-  Instr4 = loadImage("bossfight_guide4.png");
-  Instr5 = loadImage("bossfight_guide5.png");
-  Instr6 = loadImage("bossfight_guide6.png");
+  Instr2 = new Gif(this, "bossfight_guide2.gif");
+  Instr3 = new Gif(this, "bossfight_guide3.gif");
+  Instr4 = new Gif(this, "bossfight_guide4.gif");
+  Instr5 = new Gif(this, "bossfight_guide5.gif");
+  Instr6 = new Gif(this, "bossfight_guide6.gif");
   gameoverScene = new Movie(this, "TempGameOver.mp4");
   sadScene = new Movie(this, "Sad.mp4");
   Train = loadImage("train.png");
@@ -336,67 +286,14 @@ void setup() {
   Bolt = loadImage("bolt.png");
   fist = loadImage("fist.png");
   gameBG = loadImage("expbg.png");
-  angyBG = loadImage("Angy.png");
-  stareBG = loadImage("Scene end.png");
-  hugBG = loadImage("Crying.png");
   suitor1Defeat = loadImage("suitor1Defeat.png");
   suitor2Defeat = loadImage("suitor2Defeat.png");
   gameOverTitle = loadImage("badending.png");
   gameOverTitle2 = loadImage("goodending.png");
-  
-  // Dialogue Sounds Initialization
-  Dialogue1 = new SoundFile(this, "01-BEDROOM.mp3");
-  Dialogue2 = new SoundFile(this, "02-BEDROOM.mp3");
-  Dialogue3 = new SoundFile(this, "03-BEDROOM.mp3");
-  Dialogue4 = new SoundFile(this, "04-BEDROOM.mp3");
-  Dialogue5 = new SoundFile(this, "05-BEDROOM.mp3");
-  Dialogue6 = new SoundFile(this, "06-TRAIN.mp3");
-  Dialogue7 = new SoundFile(this, "07-TRAIN.mp3");
-  Dialogue8 = new SoundFile(this, "08-TRAIN.mp3");
-  Dialogue9 = new SoundFile(this, "09-TRAIN.mp3");
-  Dialogue10 = new SoundFile(this, "10-TRAIN.mp3");
-  Dialogue11 = new SoundFile(this, "11-TRAIN.mp3");
-  Dialogue12 = new SoundFile(this, "12-SUITOR 1.mp3");
-  Dialogue13 = new SoundFile(this, "13-SUITOR 1.mp3");
-  Dialogue14 = new SoundFile(this, "14-SUITOR 1.mp3");
-  Dialogue15 = new SoundFile(this, "15-SUITOR 1.mp3");
-  Dialogue16 = new SoundFile(this, "16-SUITOR 2.mp3");
-  Dialogue17 = new SoundFile(this, "17-SUITOR 2.mp3");
-  Dialogue18 = new SoundFile(this, "18-SUITOR 2.mp3");
-  Dialogue19 = new SoundFile(this, "19-SUITOR 3.mp3");
-  Dialogue20 = new SoundFile(this, "20-SUITOR 3.mp3");
-  Dialogue21 = new SoundFile(this, "21-SUITOR 3.mp3");
-  Dialogue22 = new SoundFile(this, "22-SUITOR 3.mp3");
-  Dialogue23 = new SoundFile(this, "23-SUITOR 3.mp3");
-  Dialogue24 = new SoundFile(this, "24-SUITOR 3.mp3");
-  Dialogue25 = new SoundFile(this, "25-SUITOR 3.mp3");
-  Dialogue26 = new SoundFile(this, "26-SUITOR 3.mp3");
-  Dialogue27 = new SoundFile(this, "27-SUITOR 3.mp3");
-  Dialogue28 = new SoundFile(this, "28-SUITOR 3.mp3");
-  Dialogue29 = new SoundFile(this, "29-SUITOR 3.mp3");
-  Dialogue30 = new SoundFile(this, "30-SUITOR 3.mp3");
-  Dialogue31 = new SoundFile(this, "31-SUITOR 3.mp3");
-  Dialogue32 = new SoundFile(this, "32-SUITOR 3.mp3");
-  Dialogue33 = new SoundFile(this, "33-SUITOR 3.mp3");
-  Dialogue34 = new SoundFile(this, "34-SUITOR 3.mp3");
-  Dialogue35 = new SoundFile(this, "01-POSTFIGHT.mp3");
-  Dialogue36 = new SoundFile(this, "02-POSTFIGHT.mp3");
-  Dialogue37 = new SoundFile(this, "03-POSTFIGHT.mp3");
-  Dialogue38 = new SoundFile(this, "04-POSTFIGHT.mp3");
-  Dialogue39 = new SoundFile(this, "05-POSTFIGHT.mp3");
-  Dialogue40 = new SoundFile(this, "06-POSTFIGHT.mp3");
-  Dialogue41 = new SoundFile(this, "07-POSTFIGHT.mp3");
-  Dialogue42 = new SoundFile(this, "08-POSTFIGHT.mp3");
-  Dialogue43 = new SoundFile(this, "09-POSTFIGHT.mp3");
-  Dialogue44 = new SoundFile(this, "10-POSTFIGHT.mp3");
-  Dialogue45 = new SoundFile(this, "11-POSTFIGHT.mp3");
-  Dialogue46 = new SoundFile(this, "12-POSTFIGHT.mp3");
-  Dialogue47 = new SoundFile(this, "13-POSTFIGHT.mp3");
 
   // Dialogue Initialization
   lore = new Dialogue();
   defeat = new Dialogue();
-  bossTUT = new Dialogue();
   grandma = new Dialogue();
   //Timer Initalization
   autoScroll = new Timer(5000);
@@ -455,10 +352,12 @@ void setup() {
   jumpIcon.loop();
   introSong.loop();
   Grandma.loop();
-  musTalk.loop();
-  richTalk.loop();
-  romTalk.loop();
   bigJump.loop();
+  Instr2.loop();
+  Instr3.loop();
+  Instr4.loop();
+  Instr5.loop();
+  Instr6.loop();
 
   //Set volumes
   Bedroom.amp(0.5);
@@ -479,10 +378,6 @@ void draw() {
 
   if (Instruction) {
     instructionScreen();
-  }
-  
-  if (bossIns) {
-    BossTutorial();
   }
 
   if (Game) {
@@ -534,18 +429,18 @@ void loreScreens() { // State where all of the initial Dialogue happens
      For more information check the Dialogue Class File*/
   case 1:
     lore.sound(Dialogue1);
-    lore.displayScene(Talking, "Phew, finally back in my dorm room.", "YA CHENG", Location);
+    lore.displayScene(Talking, "Phew, finally back in my dorm room.", "MOM", Location);
     lore.moveScene(2);
     break;
   case 2:
-    lore.sound(Dialogue2);
-    lore.displayScene(Talking, "Hmm... a package for me?", "YA CHENG", Box);
+    lore.sound(Dialogue3);
+    lore.displayScene(Talking, "Hmm... a package for me?", "MOM", Box);
     lore.moveScene(3);
     break;
   case 3:
     lore.sound(boxOpen);
-    lore.sound(Dialogue3);
-    lore.displayScene(Talking, "A letter from Mother... 'Don't fall in love', huh...", "YA CHENG", openBox);
+    lore.sound(Dialogue2);
+    lore.displayScene(Talking, "A letter from Mother... 'Don't fall in love', huh...", "MOM", openBox);
     lore.moveScene(4);
     break;
   case 4:
@@ -553,43 +448,43 @@ void loreScreens() { // State where all of the initial Dialogue happens
     lore.moveScene(5);
     break;
   case 5:
-    lore.sound(Dialogue4);
-    lore.displayScene(Talking, "*sigh* Ever since I was young,\nI always had to maintain my family's honour.", "YA CHENG", sadScene);
+    lore.sound(Dialogue2);
+    lore.displayScene(Talking, "*sigh* Ever since I was young,\nI always had to maintain my family's honour.", "MOM", sadScene);
     lore.moveScene(6);
     break;
   case 6:
-    lore.sound(Dialogue5);
-    lore.displayScene(Talking, "I thought I'd be trapped under their roof forever,\nbut one day I got admitted to a university far away...", "YA CHENG", sadScene);
+    lore.sound(Dialogue2);
+    lore.displayScene(Talking, "I thought I'd be trapped under their roof forever,\nbut one day I got admitted to a university far away...", "MOM", sadScene);
     lore.moveScene(7);
     break;
   case 7:
-    lore.sound(Dialogue6);
-    lore.displayScene(Grandma, "I just wanted to say one thing to you before you leave...", "MOM", Train);
+    lore.sound(Dialogue4);
+    lore.displayScene(Grandma, "I just wanted to say one thing to you before you leave...", "GRANDMA", Train);
     lore.moveScene(8);
     break;
   case 8:
-    lore.sound(Dialogue7);
-    lore.displayScene(Grandma, "Just because I'm not there...", "MOM", Train);
+    lore.sound(Dialogue4);
+    lore.displayScene(Grandma, "Just because I'm not there...", "GRANDMA", Train);
     lore.moveScene(9);
     break;
   case 9:
-    lore.sound(Dialogue8);
-    lore.displayScene(Grandma, "Does not mean you can fall in love.", "MOM", Train);
+    lore.sound(Dialogue4);
+    lore.displayScene(Grandma, "Does not mean you can fall in love.", "GRANDMA", Train);
     lore.moveScene(10);
     break;
   case 10:
-    lore.sound(Dialogue9);
-    lore.displayScene(Grandma, "And remember...", "MOM", Train);
+    lore.sound(Dialogue4);
+    lore.displayScene(Grandma, "And remember...", "GRANDMA", Train);
     lore.moveScene(11);
     break;
   case 11:
-    lore.sound(Dialogue10);
-    lore.displayScene(Grandma, "I'm coming to visit you after your classes end.", "MOM", Train);
+    lore.sound(Dialogue4);
+    lore.displayScene(Grandma, "I'm coming to visit you after your classes end.", "GRANDMA", Train);
     lore.moveScene(12);
     break;
   case 12:
-    lore.sound(Dialogue11);
-    lore.displayScene(Talking, "Yes, Mother...", "YA CHENG", Train);
+    lore.sound(Dialogue3);
+    lore.displayScene(Talking, "Yes, Mother...", "MOM", Train);
     lore.exitLore();
     break;
   }
@@ -684,24 +579,20 @@ void defeatScreen() {
   if (MusicianDialogue) {
       switch (defeat.curScene){
         case 1:
-        defeat.sound(Dialogue12);
-        defeat.displayScene(musTalk, "Hello, beautiful... \nWould you like to be my muse for my next album?",
+        defeat.displayScene(Talking, "Hello, beautiful... \nWould you like to be my muse for my next album?",
         "CHANG YING", suitor1Defeat);
         defeat.moveScene(2);
         break;
         case 2:
-        defeat.sound(Dialogue13);
-        defeat.displayScene(Talking, "Thanks, but I'm not interested.", "YA CHENG", suitor1Defeat);
+        defeat.displayScene(Talking, "Thanks, but I'm not interested.", "MOM", suitor1Defeat);
         defeat.moveScene(3);
         break;
         case 3:
-        defeat.sound(Dialogue14);
-        defeat.displayScene(musTalk, "*dejected* Could you at least buy my latest single?", "CHANG YING", suitor1Defeat);
+        defeat.displayScene(Talking, "*dejected* Could you at least buy my latest single?", "CHANG YING", suitor1Defeat);
         defeat.moveScene(4);
         break;
         case 4:
-        defeat.sound(Dialogue15);
-        defeat.displayScene(Talking, "No thanks.", "YA CHENG", suitor1Defeat);
+        defeat.displayScene(Talking, "No thanks.", "MOM", suitor1Defeat);
         defeat.exitDefeat(1);
         break;
       }
@@ -709,24 +600,20 @@ void defeatScreen() {
   if (RichDialogue) {
       switch (defeat.curScene){
         case 1:
-        defeat.sound(Dialogue16);
-        defeat.displayScene(richTalk, "A high-achieving woman like yourself \ndeserves a high-value man like me, no?",
+        defeat.displayScene(Talking, "A high-achieving woman like yourself \ndeserves a high-value man like me, no?",
         "SHOU SHAN", suitor2Defeat);
         defeat.moveScene(2);
         break;
         case 2:
-        defeat.sound(Dialogue17);
-        defeat.displayScene(richTalk, "I could buy anything you could ever want.", "SHOU SHAN", suitor2Defeat);
+        defeat.displayScene(Talking, "I could buy anything you could ever want.", "SHOU SHAN", suitor2Defeat);
         defeat.moveScene(3);
         break;
         case 3:
-        defeat.sound(Dialogue18);
-        defeat.displayScene(Talking, "*hesitant* I... I don't need anything from you.", "YA CHENG", suitor2Defeat);
+        defeat.displayScene(Talking, "*hesitant* I... I don't need anything from you.", "MOM", suitor2Defeat);
         defeat.moveScene(4);
         break;
         case 4:
-        defeat.sound(Dialogue19);
-        defeat.displayScene(richTalk, "I guess money can't buy everything...", "SHOU SHAN", suitor2Defeat);
+        defeat.displayScene(Talking, "I guess money can't buy everything...", "SHOU SHAN", suitor2Defeat);
         defeat.exitDefeat(2);
         break;
       }
@@ -734,154 +621,74 @@ void defeatScreen() {
   if (RomanticDialogue) {
         switch (defeat.curScene){
         case 1:
-        defeat.sound(Dialogue20);
-        defeat.displayScene(romTalk, "The way the light catches your face... it's like a painting.",
+        defeat.displayScene(Talking, "The way the light catches your face... it's like a painting.",
         "QING LING", suitor2Defeat);
         defeat.moveScene(2);
         break;
         case 2:
-        defeat.sound(Dialogue19);
-        defeat.displayScene(Talking, "Oh, stop it.", "YA CHENG", suitor2Defeat);
+        defeat.displayScene(Talking, "Oh, stop it.", "MOM", suitor2Defeat);
         defeat.moveScene(3);
         break;
         case 3:
-        defeat.sound(Dialogue22);
-        defeat.displayScene(romTalk, "Ya Cheng, I've been wanting to tell you this for a while.", "QING LING", suitor2Defeat);
+        defeat.displayScene(Talking, "Ya Cheng, I've been wanting to tell you this for a while.", "QING LING", suitor2Defeat);
         defeat.moveScene(4);
         break;
         case 4:
-        defeat.sound(Dialogue22);
-        defeat.displayScene(romTalk, "I... I think I'm falling for you", "QING LING", suitor2Defeat);
+        defeat.displayScene(Talking, "I... I think I'm falling for you", "QING LING", suitor2Defeat);
         defeat.moveScene(5);
         break;
         case 5:
-        defeat.sound(Dialogue24);
-        defeat.displayScene(Talking, "I... I don't know what to say.", "YA CHENG", suitor2Defeat);
+        defeat.displayScene(Talking, "I... I don't know what to say.", "MOM", suitor2Defeat);
         defeat.moveScene(6);
         break;
         case 6:
-        defeat.sound(Dialogue25);
-        defeat.displayScene(romTalk, "You don't have to say anything.", "QING LING", suitor2Defeat);
+        defeat.displayScene(Talking, "You don't have to say anything.", "QING LING", suitor2Defeat);
         defeat.moveScene(7);
         break;
         case 7:
-        defeat.sound(Dialogue26);
-        defeat.displayScene(romTalk, "Just know that I care about you deeply.", "QING LING", suitor2Defeat);
+        defeat.displayScene(Talking, "Just know that I care about you deeply.", "QING LING", suitor2Defeat);
         defeat.moveScene(8);
         break;
         case 8:
-        defeat.sound(Dialogue27);
-        defeat.displayScene(Talking, "I... I care about you too.", "YA CHENG", suitor2Defeat);
+        defeat.displayScene(Talking, "I... I care about you too.", "MOM", suitor2Defeat);
         defeat.moveScene(9);
         break;
         case 9:
-        defeat.sound(Dialogue28);
-        defeat.displayScene(Talking, "But...", "YA CHENG", suitor2Defeat);
+        defeat.displayScene(Talking, "But...", "MOM", suitor2Defeat);
         defeat.moveScene(10);
         break;
         case 10:
-        defeat.sound(Dialogue29);
-        defeat.displayScene(Grandma, "What...the? What is this?", "MOM", angyBG);
+        defeat.displayScene(Talking, "What...the? What is this?", "GRANDMA", suitor2Defeat);
         defeat.moveScene(11);
         break;
         case 11:
-        defeat.sound(Dialogue30);
-        defeat.displayScene(Talking, "Mom, we...", "YA CHENG", angyBG);
+        defeat.displayScene(Talking, "Mom, we...", "MOM", suitor2Defeat);
         defeat.moveScene(12);
         break;
         case 12:
-        defeat.sound(Dialogue31);
-        defeat.displayScene(Grandma, "I can't believe this!", "MOM", angyBG);
+        defeat.displayScene(Talking, "I can't believe this!", "GRANDMA", suitor2Defeat);
         defeat.moveScene(13);
         break;
         case 13:
-        defeat.sound(Dialogue32);
-        defeat.displayScene(Talking, "I know, mother. I tried...", "YA CHENG", angyBG);
+        defeat.displayScene(Talking, "I know, mother. I tried...", "MOM", suitor2Defeat);
         defeat.moveScene(14);
         break;
         case 14:
-        defeat.sound(Dialogue33);
-        defeat.displayScene(Grandma, "Tried? That's not good enough!", "MOM", angyBG);
+        defeat.displayScene(Talking, "Tried? That's not good enough!", "GRANDMA", suitor2Defeat);
         defeat.moveScene(15);
         break;
         case 15:
-        defeat.sound(Dialogue34);
-        defeat.displayScene(Grandma, "We need to talk now!", "MOM", angyBG);
+        defeat.displayScene(Talking, "We need to talk now!", "GRANDMA", suitor2Defeat);
         defeat.exitDefeat(3);
         break;
       }
-  }
     if (grandmaDialogue){
       switch(grandma.curScene){
         case 1:
-        grandma.sound(Dialogue35);
-        grandma.displayScene(Grandma, "Is this... really what you desire, my child?",
-        "MOM", stareBG);
-        grandma.moveScene(2);
-        break;
-        case 2:
-        grandma.sound(Dialogue36);
-        grandma.displayScene(Talking, "Yes, mother. I truly love him.", "YA CHENG", stareBG);
-        grandma.moveScene(3);
-        break;
-        case 3:
-        grandma.sound(Dialogue37);
-        grandma.displayScene(Grandma, "...", "MOM", stareBG);
-        grandma.moveScene(4);
-        break;
-        case 4:
-        grandma.sound(Dialogue38);
-        grandma.displayScene(Talking, "I know that you're only against this \nbecause you love me and want the best for me.", "YA CHENG", stareBG);
-        grandma.moveScene(5);
-        break;
-        case 5:
-        grandma.sound(Dialogue39);
-        grandma.displayScene(Talking, "I know that, and I'm very thankful.", "YA CHENG", stareBG);
-        grandma.moveScene(6);
-        break;
-        case 6:
-        grandma.sound(Dialogue40);
-        grandma.displayScene(Talking, "So please, just once, \ntrust me to make this choice for myself.", "YA CHENG", stareBG);
-        grandma.moveScene(7);
-        break;
-        case 7:
-        grandma.sound(Dialogue41);
-        grandma.displayScene(Grandma, "...", "MOM", stareBG);
-        grandma.moveScene(8);
-        break;
-        case 8:
-        grandma.sound(Dialogue42);
-        grandma.displayScene(Grandma, "Okay.", "MOM", hugBG);
-        grandma.moveScene(9);
-        break;
-        case 9:
-        grandma.sound(Dialogue43);
-        grandma.displayScene(Talking, "?!", "YA CHENG", hugBG);
-        grandma.moveScene(10);
-        break;
-        case 10:
-        grandma.sound(Dialogue44);
-        grandma.displayScene(Grandma, "Go. Be with him. Before I change my mind.", "MOM", hugBG);
-        grandma.moveScene(11);
-        break;
-        case 11:
-        grandma.sound(Dialogue45);
-        grandma.displayScene(Talking, "Mother, I… Thank you so much-", "YA CHENG", hugBG);
-        grandma.moveScene(12);
-        break;
-        case 12:
-        grandma.sound(Dialogue46);
-        grandma.displayScene(Grandma, "You. \nTake care of my foolish daughter for me.", "MOM", hugBG);
-        grandma.moveScene(13);
-        break;
-        case 13:
-        grandma.sound(Dialogue47);
-        grandma.displayScene(romTalk, "I will do my best, ma'am.", "QING LING", hugBG);
-        grandma.exitDefeat(5);
-        break;
       }
     }
   }
+}
 
 void gameScreen() {
   image(gameBG, 0, 0); //Sets Background
@@ -1008,7 +815,6 @@ void Suit2() {
     pauseCounter = true;
     Bedroom.pause();
     heartShatter.play();
-    RichSong.pause();
     RichDialogue = true;
     Game = false;
     Defeat = true;
@@ -1064,8 +870,8 @@ void Suit3() {
       playerHealth--;
       if (playerHealth == 0) {
         Game = false;
+        Defeat = true;
         RomanticDialogue = true;
-        Defeat = true;   
       }
     }
     attack.start();
@@ -1255,6 +1061,7 @@ void oofSound() { // Randomize between a series of Oof Sounds
 void deathCheck() { // Change state to death
   Lore = false;
   Game = false;
+  Defeat = false;
   Death = true;
 }
 void momHealthbar() { // Generate the mom health bar and broken heart counter
@@ -1308,6 +1115,8 @@ void movieEvent(Movie m) { // movie play event
   m.read();
 }
 
+void bossTut() {
+}
 
 void keyPressed() { // Debugging tool to skip to final boss for testing
   if (key == 'm') {
@@ -1322,18 +1131,8 @@ void keyPressed() { // Debugging tool to skip to final boss for testing
     Start = false;
     Lore = true;
   }
-  if (key == 'y') {
-    Calibrate = false;
-    index = 0;
-    Defeat = true;
-    RomanticDialogue = true;
-  }
   if (key == 'a') {
     attacked();
-  }
-  if (key == 'j'){
-    Jump();
-    Game = true;
   }
 }
 

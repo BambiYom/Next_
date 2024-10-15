@@ -1,3 +1,43 @@
+void BossTutorial(){
+  switch (bossTUT.curScene) {
+    case 1:
+      image(Instr1,0,0);
+      displayText("It's time to convince your mom!", 95, 1045);
+      bossTUT.moveScene(2);
+      break;
+    case 2:
+      image(Instr2,0,0);
+      displayText("Jump if you think the response on the card is what you want to say to mom.", 95, 1045);
+      bossTUT.moveScene(3);
+      break;
+    case 3:
+      image(Instr3,0,0);
+      displayText("Stay still if you don't want to use that response.", 95, 1045);
+      bossTUT.moveScene(4);
+      break;
+    case 4:
+      image(Instr4,0,0);
+      displayText("The rope represents the time available for each response.", 95, 1045);
+      bossTUT.moveScene(5);
+      break;
+    case 5:
+      image(Instr4,0,0);
+      displayText("Make your move before the rope burns out, or the response will automatically move to the next one.", 95, 1045);
+      bossTUT.moveScene(6);
+      break;
+    case 6:
+      image(Instr5,0,0);
+      displayText("Make your move before the rope burns out, or the response will automatically move to the next one.", 95, 1045);
+      bossTUT.moveScene(7);
+      break;
+    case 7:
+      image(Instr6,0,0);
+      displayText("Your choices will shape the outcome with mom — will you be able to convince her?", 95, 1045);
+      bossTUT.exitDefeat(4);
+      break;
+  }
+}
+
 void new_Boss(){
   image(bg, 0, 0);
   // Update timer
